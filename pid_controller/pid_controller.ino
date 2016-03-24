@@ -20,7 +20,7 @@
 
 #define potentiometerPin 61
 
-#define DEBOUNCING_TIME_US 10000
+#define DEBOUNCING_TIME_US 5
 
 volatile int leftInterruptPinValue = 0;
 volatile int leftDigitalPinValue = 0;
@@ -47,6 +47,8 @@ enum side
   rightMotor
 };
 
+int cl = 0, cr = 0;
+
 // This is our Interrupt Service Routine
 // It has to be defined before getting called, so we put it up front here.
 void __attribute__((interrupt)) leftInterruptRoutine()
@@ -57,6 +59,12 @@ void __attribute__((interrupt)) leftInterruptRoutine()
     leftDigitalPinValue = digitalRead(leftDigitalPin);
   
     leftInterruptPinValue ^ leftDigitalPinValue ? leftPosition-- : leftPosition++;
+    
+    if (leftPosition % 100 == 0) {
+      cl ++;
+      Serial.print("left");
+      Serial.println(cl);
+    }
 
     clearIntFlag(_EXTERNAL_1_IRQ); // Now that you've serviced the interrupt, clear
                                    // the interrupt flag so it doesn't get called
@@ -77,6 +85,12 @@ void __attribute__((interrupt)) rightInterruptRoutine()
     rightDigitalPinValue = digitalRead(rightDigitalPin);
     
     rightInterruptPinValue ^ rightDigitalPinValue ? rightPosition-- : rightPosition++;
+
+    if (rightPosition % 100 == 0) {
+      cr ++;
+      Serial.print("right");
+      Serial.println(cr);
+    }
     
     clearIntFlag(_EXTERNAL_2_IRQ); // Now that you've serviced the interrupt, clear
                                  // the interrupt flag so it doesn't get called
@@ -144,6 +158,7 @@ void loop()
   delay(2000);
   fastBrake(leftMotor);
   fastBrake(rightMotor);
+  
   turnMotor(leftMotor, backward, 50);
   turnMotor(rightMotor, backward, 50);
   delay(2000);

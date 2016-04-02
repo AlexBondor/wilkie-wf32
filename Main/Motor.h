@@ -9,7 +9,7 @@ class Motor
   public:
     Motor();
     void attach(int, int, int);
-    void turn(int, int);
+    void turn(int);
     void brake();
     enum direction
 	{

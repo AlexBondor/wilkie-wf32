@@ -27,12 +27,19 @@ void Motor::attach(int directionPinA, int directionPinB, int pwmPin)
 *   Turns the motor in a desired direction
 *   forward/backward with a desired speed
 */
-void Motor::turn(int direction, int speed)
+void Motor::turn(int speed)
 {
+  if (speed >= 0) 
+  {
+    _inA = HIGH;
+  }
+  else
+  {
+    _inA = LOW;
+    speed = -speed;
+  }
 	// Adjust speed so it won't exceed imposed limits by PWM
 	speed < 0 ? speed = 0 : speed > 255 ? speed = 255 : speed = speed;
-
-	_inA = direction == FORWARD ? HIGH : LOW;
 
 	digitalWrite(_directionPinA, _inA);
 	digitalWrite(_directionPinB, !_inA);

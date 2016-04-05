@@ -57,7 +57,10 @@ long lastInterruptMicros = 0;
  * pin on Chipkit WF32 due to not so many interrupts available on the board
  */
 void __attribute__((interrupt)) handleInterrupt1()
-{
+{  
+  encoders[ENCODER_1_INDEX].timeBetweenInterrupts = micros() - encoders[ENCODER_1_INDEX].lastInterruptMicros;
+  encoders[ENCODER_1_INDEX].lastInterruptMicros = micros();
+  
 	interruptPinValue = digitalRead(encoders[ENCODER_1_INDEX].interruptPin);
 	digitalPinValue = digitalRead(encoders[ENCODER_1_INDEX].digitalPin);
 
@@ -67,8 +70,23 @@ void __attribute__((interrupt)) handleInterrupt1()
                                                                       								 // the interrupt flag so it doesn't get called
                                                                       								 // twice.
 
-  encoders[ENCODER_1_INDEX].speed = micros() - encoders[ENCODER_1_INDEX].lastInterruptMicros;
-  encoders[ENCODER_1_INDEX].lastInterruptMicros = micros();
+  if (encoders[ENCODER_1_INDEX].timeBetweenInterrupts <= 0)
+  {
+    return;
+  }
+
+  // Subtract the last reading
+  encoders[ENCODER_1_INDEX].total -= encoders[ENCODER_1_INDEX].readings[encoders[ENCODER_1_INDEX].readIndex];
+  // Save new data to readings vector
+  encoders[ENCODER_1_INDEX].readings[encoders[ENCODER_1_INDEX].readIndex++] = encoders[ENCODER_1_INDEX].timeBetweenInterrupts;
+  // Add new data to total value
+  encoders[ENCODER_1_INDEX].total += encoders[ENCODER_1_INDEX].timeBetweenInterrupts;
+  if (encoders[ENCODER_1_INDEX].readIndex == NUM_READINGS)
+  {
+    encoders[ENCODER_1_INDEX].readIndex = 0;
+  }
+  // Compute the average value
+  encoders[ENCODER_1_INDEX].average = encoders[ENCODER_1_INDEX].total / NUM_READINGS;
 }
 
 /*
@@ -82,18 +100,37 @@ void __attribute__((interrupt)) handleInterrupt1()
  * pin on Chipkit WF32 due to not so many interrupts available on the board
  */
 void __attribute__((interrupt)) handleInterrupt2()
-{
+{  
+  encoders[ENCODER_2_INDEX].timeBetweenInterrupts = micros() - encoders[ENCODER_2_INDEX].lastInterruptMicros;
+  encoders[ENCODER_2_INDEX].lastInterruptMicros = micros();
+  
   interruptPinValue = digitalRead(encoders[ENCODER_2_INDEX].interruptPin);
   digitalPinValue = digitalRead(encoders[ENCODER_2_INDEX].digitalPin);
 
-  interruptPinValue ^ digitalPinValue ? encoders[ENCODER_2_INDEX].position++ : encoders[ENCODER_2_INDEX].position--;
+  interruptPinValue ^ digitalPinValue ? encoders[ENCODER_2_INDEX].position-- : encoders[ENCODER_2_INDEX].position++;
 
   clearIntFlag(INTERRUPT_PIN_TO_EXTERNAL_IRQ(encoders[ENCODER_2_INDEX].interruptPin)); // Now that you've serviced the interrupt, clear
                                                                                        // the interrupt flag so it doesn't get called
-                                                                                       // twice. 
+                                                                                       // twice.
 
-  encoders[ENCODER_2_INDEX].speed = micros() - encoders[ENCODER_2_INDEX].lastInterruptMicros;
-  encoders[ENCODER_2_INDEX].lastInterruptMicros = micros();
+  if (encoders[ENCODER_2_INDEX].timeBetweenInterrupts < DINT_MIN_LIMIT || encoders[ENCODER_2_INDEX].timeBetweenInterrupts > DINT_MAX_LIMIT)
+  {
+    return;
+  }
+
+  // Subtract the last reading
+  encoders[ENCODER_2_INDEX].total -= encoders[ENCODER_2_INDEX].readings[encoders[ENCODER_2_INDEX].readIndex];
+  // Save new data to readings vector
+  encoders[ENCODER_2_INDEX].readings[encoders[ENCODER_2_INDEX].readIndex++] = encoders[ENCODER_2_INDEX].timeBetweenInterrupts;
+  // Add new data to total value
+  encoders[ENCODER_2_INDEX].total += encoders[ENCODER_2_INDEX].timeBetweenInterrupts;
+  if (encoders[ENCODER_2_INDEX].readIndex == NUM_READINGS)
+  {
+    encoders[ENCODER_2_INDEX].readIndex = 0;
+  }
+  
+  // Compute the average value
+  encoders[ENCODER_2_INDEX].average = encoders[ENCODER_2_INDEX].total / NUM_READINGS;
 }
 
 void Encoder::interruptInitialSetup(int interruptPin)
@@ -133,7 +170,7 @@ Encoder::Encoder()
 {
   _id = _encoderCount++;
   encoders[_id].position = 0;
-  encoders[_id].speed = 0;
+  encoders[_id].timeBetweenInterrupts = 0;
   encoders[_id].lastInterruptMicros = 0;
 }
 
@@ -164,6 +201,14 @@ volatile int Encoder::getPosition()
     
 volatile int Encoder::getSpeed()
 {
-  return encoders[_id].speed;
+  // Robot stopped
+  if (micros() - encoders[_id].lastInterruptMicros > encoders[_id].timeBetweenInterrupts + MAX_STALL_TIME)
+  {
+    return 0;  
+  }
+  if (encoders[_id].average != 0) {
+    return DINT_TO_RMP / encoders[_id].average;
+  }
+  return 0;
 }
 

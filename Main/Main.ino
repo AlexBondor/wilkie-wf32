@@ -1,12 +1,15 @@
 #include "Config.h"
 #include "Motor.h"
 #include "Encoder.h"
+#include "FuzzyController.h"
 
 Motor leftMotor;
 Motor rightMotor;
 
 Encoder leftEncoder;
 Encoder rightEncoder;
+
+FuzzyController fuzzyController;
 
 void setup()
 {
@@ -23,12 +26,26 @@ void setup()
 
 void loop()
 {
-  Serial.print("left: ");
-  Serial.print(leftEncoder.getPosition());
-  Serial.print(" right: ");
-  Serial.println(rightEncoder.getPosition());
-  leftMotor.turn(Motor::FORWARD, 50);
-  rightMotor.turn(Motor::FORWARD, 50);
-  delay(1);
+  int rin = rightEncoder.getSpeed();
+  fuzzyController.setInput(1, rin);
+  fuzzyController.fuzzify();
+  int rout = fuzzyController.defuzzify(1);
+  
+  int lin = leftEncoder.getSpeed();
+  fuzzyController.setInput(1, lin);
+  fuzzyController.fuzzify();
+  int lout = fuzzyController.defuzzify(1);
+  
+  leftMotor.turn(lout);
+  rightMotor.turn(rout);
+
+  Serial.print("lin: ");
+  Serial.print(lin);
+  Serial.print(" lout: ");
+  Serial.print(lout);
+  Serial.print(" rin: ");
+  Serial.print(rin);
+  Serial.print(" rout: ");
+  Serial.println(rout);
 }
 

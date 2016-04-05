@@ -2,13 +2,13 @@
 
 #define PWM_MIN   50
 #define PWM_MAX  255
-#define PWM_ZERO 120
-#define PWM_STEP  10
+#define PWM_ZERO 130
+#define PWM_STEP  20
 
-#define RPM_MIN   0
-#define RPM_MAX 600
-#define RPM_ZERO 140
-#define RPM_STEP  10
+#define RPM_MIN    0
+#define RPM_MAX  600
+#define RPM_ZERO 160
+#define RPM_STEP  20
 
 FuzzyController::FuzzyController()
 {

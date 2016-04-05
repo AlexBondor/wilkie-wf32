@@ -107,7 +107,7 @@ void __attribute__((interrupt)) handleInterrupt2()
   interruptPinValue = digitalRead(encoders[ENCODER_2_INDEX].interruptPin);
   digitalPinValue = digitalRead(encoders[ENCODER_2_INDEX].digitalPin);
 
-  interruptPinValue ^ digitalPinValue ? encoders[ENCODER_2_INDEX].position-- : encoders[ENCODER_2_INDEX].position++;
+  interruptPinValue ^ digitalPinValue ? encoders[ENCODER_2_INDEX].position++ : encoders[ENCODER_2_INDEX].position--;
 
   clearIntFlag(INTERRUPT_PIN_TO_EXTERNAL_IRQ(encoders[ENCODER_2_INDEX].interruptPin)); // Now that you've serviced the interrupt, clear
                                                                                        // the interrupt flag so it doesn't get called
@@ -194,9 +194,9 @@ void Encoder::attach(int interruptPin, int digitalPin)
  * Simply return the position of the encoder which changes when each
  * interrupt occurs
  */
-volatile int Encoder::getPosition()
+volatile float Encoder::getPosition()
 {
-	return encoders[_id].position;
+	return (encoders[_id].position / (INT_PER_REVOLUTION)) * WHEEL_CIRCUMFERENCE;
 }
     
 volatile int Encoder::getSpeed()

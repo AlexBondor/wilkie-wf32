@@ -48,13 +48,20 @@
 
 // Use this time in microseconds to identify
 // that the motor is not rotating anymore
-#define MAX_STALL_TIME 20000
+#define MAX_STALL_TIME 20000 
+
+// Number of encoder wheel interrupts for the robot wheel
+// to make a revolution
+#define INT_PER_REVOLUTION 57
+
+// Robot wheel circumference in cm
+#define WHEEL_CIRCUMFERENCE 10.05
 
 typedef struct 
 {
   int interruptPin;
   int digitalPin;
-  volatile int position;
+  volatile float position;
   volatile int timeBetweenInterrupts;
   volatile long lastInterruptMicros;
   
@@ -72,7 +79,7 @@ class Encoder
   public:
     Encoder();
     void attach(int, int);
-    volatile int getPosition();
+    volatile float getPosition();
     volatile int getSpeed();
 
   private:

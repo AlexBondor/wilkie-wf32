@@ -11,11 +11,6 @@ class Motor
     void attach(int, int, int);
     void turn(int);
     void brake();
-    enum direction
-	{
-	  FORWARD,
-	  BACKWARD
-	};
 
   private:
   	int _directionPinA;

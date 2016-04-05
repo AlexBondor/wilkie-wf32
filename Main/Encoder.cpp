@@ -44,6 +44,8 @@ int interruptPinValue, digitalPinValue;
 
 uint8_t _encoderCount = 0;
 
+long lastInterruptMicros = 0;
+
 /*
  * Interrupt routine for pin connected to INT1 on Chipkit WF32
  * 
@@ -64,6 +66,9 @@ void __attribute__((interrupt)) handleInterrupt1()
 	clearIntFlag(INTERRUPT_PIN_TO_EXTERNAL_IRQ(encoders[ENCODER_1_INDEX].interruptPin)); // Now that you've serviced the interrupt, clear
                                                                       								 // the interrupt flag so it doesn't get called
                                                                       								 // twice.
+
+  encoders[ENCODER_1_INDEX].speed = micros() - encoders[ENCODER_1_INDEX].lastInterruptMicros;
+  encoders[ENCODER_1_INDEX].lastInterruptMicros = micros();
 }
 
 /*
@@ -86,6 +91,9 @@ void __attribute__((interrupt)) handleInterrupt2()
   clearIntFlag(INTERRUPT_PIN_TO_EXTERNAL_IRQ(encoders[ENCODER_2_INDEX].interruptPin)); // Now that you've serviced the interrupt, clear
                                                                                        // the interrupt flag so it doesn't get called
                                                                                        // twice. 
+
+  encoders[ENCODER_2_INDEX].speed = micros() - encoders[ENCODER_2_INDEX].lastInterruptMicros;
+  encoders[ENCODER_2_INDEX].lastInterruptMicros = micros();
 }
 
 void Encoder::interruptInitialSetup(int interruptPin)
@@ -125,6 +133,8 @@ Encoder::Encoder()
 {
   _id = _encoderCount++;
   encoders[_id].position = 0;
+  encoders[_id].speed = 0;
+  encoders[_id].lastInterruptMicros = 0;
 }
 
 /*
@@ -151,3 +161,9 @@ volatile int Encoder::getPosition()
 {
 	return encoders[_id].position;
 }
+    
+volatile int Encoder::getSpeed()
+{
+  return encoders[_id].speed;
+}
+

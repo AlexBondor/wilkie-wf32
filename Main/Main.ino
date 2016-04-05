@@ -11,6 +11,8 @@ Encoder rightEncoder;
 
 FuzzyController fuzzyController;
 
+long start;
+
 void setup()
 {
   // Attach motors
@@ -22,10 +24,21 @@ void setup()
   rightEncoder.attach(RIGHT_ENCODER_INT_PIN, RIGHT_ENCODER_DIGITAL_PIN);
   
   Serial.begin(115200);
+  start = millis();
 }
 
 void loop()
 {
+  if (millis() - start > 3000)
+  {
+    leftMotor.brake();
+    rightMotor.brake();
+    Serial.print("Left distance: ");
+    Serial.print(leftEncoder.getPosition());
+    Serial.print("Right distance: ");
+    Serial.println(rightEncoder.getPosition());
+    while(1);
+  }
   int rin = rightEncoder.getSpeed();
   fuzzyController.setInput(1, rin);
   fuzzyController.fuzzify();

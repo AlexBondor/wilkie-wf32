@@ -2,13 +2,13 @@
 
 #define PWM_MIN   50
 #define PWM_MAX  255
-#define PWM_ZERO 130
-#define PWM_STEP  20
+#define PWM_ZERO  62
+#define PWM_STEP  10
 
 #define RPM_MIN    0
-#define RPM_MAX  600
-#define RPM_ZERO 160
-#define RPM_STEP  20
+#define RPM_MAX  250
+#define RPM_ZERO 100
+#define RPM_STEP   5
 
 FuzzyController::FuzzyController()
 {
@@ -30,7 +30,6 @@ FuzzyController::FuzzyController()
   
   _fuzzy->addFuzzyInput(RPM);
 
-  
   // Output PWM
   FuzzySet*         low_PWM = new FuzzySet(                PWM_MIN,                 PWM_MIN, PWM_ZERO - 2 * PWM_STEP, PWM_ZERO -     PWM_STEP);
   FuzzySet*  little_low_PWM = new FuzzySet(PWM_ZERO - 2 * PWM_STEP, PWM_ZERO -     PWM_STEP, PWM_ZERO -     PWM_STEP,                PWM_ZERO);

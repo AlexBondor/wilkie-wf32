@@ -15,3 +15,5 @@
 #define RIGHT_MOTOR_IN_A_PIN  5 // direction pin
 #define RIGHT_MOTOR_IN_B_PIN 31 // direction pin
 #define RIGHT_MOTOR_PWM_PIN   6 // enable pin used for PWM signal
+
+#define VACUUM_PIN 29

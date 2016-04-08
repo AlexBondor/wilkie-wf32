@@ -194,11 +194,14 @@ void Encoder::attach(int interruptPin, int digitalPin)
  * Simply return the position of the encoder which changes when each
  * interrupt occurs
  */
-volatile float Encoder::getPosition()
+volatile double Encoder::getPosition()
 {
 	return (encoders[_id].position / (INT_PER_REVOLUTION)) * WHEEL_CIRCUMFERENCE;
 }
-    
+
+/*
+ * Return the speed of the robot in RPM
+ */
 volatile int Encoder::getSpeed()
 {
   // Robot stopped
@@ -210,5 +213,13 @@ volatile int Encoder::getSpeed()
     return DINT_TO_RMP / encoders[_id].average;
   }
   return 0;
+}
+
+/*
+ * Set the position of current encoder to 0
+ */
+void Encoder::resetPosition()
+{
+  encoders[_id].position = 0;
 }
 

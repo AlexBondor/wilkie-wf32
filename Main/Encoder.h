@@ -5,6 +5,7 @@
 #include "Arduino.h"
 
 #define MAX_ENCODERS 2
+
 // Needed to obtain the RPM value given the time
 // between consecutive interrupts in microseconds
 //
@@ -19,25 +20,25 @@
 //
 // T_EWRus = 3 * T_INT;         // 3 encoder wheel interrupts per encoder wheel rotation
 // T_EWRs  = T_EWRus / 1000000; // 1s = 1000000us
-// T_WRs   = 19 * T_EWRs;       // it takes 19 encoder wheel rotation for the robot wheel
-//                              // to make one revolution (19:1 gear ratio)
+// T_WRs   = 53 * T_EWRs;       // it takes 53 encoder wheel rotation for the robot wheel
+//                              // to make one revolution (53:1 gear ratio)
 // N_WR/s  = 1 / T_WRs
 // RPM     = 60 * N_WR / s
 //
 // So.. 
 //                    1 * 60
 // DINT_TO_RPM =  --------------
-//                T_INT * 3 * 19
+//                T_INT * 3 * 53
 //                 -----------
 //                   1000000
 //
-#define DINT_TO_RMP 1052631
+#define DINT_TO_RMP 337358
 
 // Lower bound of the data interval
-// Represents ~700 RPM
+// Represents ~250 RPM
 #define DINT_MIN_LIMIT 1500
 // Upper bound of the data interval
-// Represents ~35 RPM
+// Represents ~3 RPM
 #define DINT_MAX_LIMIT 110000
 
 // Used by filtering algorithm
@@ -52,7 +53,7 @@
 
 // Number of encoder wheel interrupts for the robot wheel
 // to make a revolution
-#define INT_PER_REVOLUTION 57
+#define INT_PER_REVOLUTION 159
 
 // Robot wheel circumference in cm
 #define WHEEL_CIRCUMFERENCE 10.05
@@ -61,7 +62,7 @@ typedef struct
 {
   int interruptPin;
   int digitalPin;
-  volatile float position;
+  volatile double position;
   volatile int timeBetweenInterrupts;
   volatile long lastInterruptMicros;
   
@@ -79,8 +80,9 @@ class Encoder
   public:
     Encoder();
     void attach(int, int);
-    volatile float getPosition();
+    volatile double getPosition();
     volatile int getSpeed();
+    void resetPosition();
 
   private:
     void interruptInitialSetup(int);

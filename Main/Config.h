@@ -17,3 +17,11 @@
 #define RIGHT_MOTOR_PWM_PIN   6 // enable pin used for PWM signal
 
 #define VACUUM_PIN 29
+
+// Bluetooth module software serial pins
+#define BLUETOOTH_RX_PIN 39
+#define BLUETOOTH_TX_PIN 40
+
+// Used by bluetooth module to do callbacks when receives data from 
+// app
+typedef void (*VoidCallbackMethod)();

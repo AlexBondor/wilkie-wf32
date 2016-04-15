@@ -14,6 +14,8 @@
 // when turning in place
 // Given that the distance between wheel is 20.8 cm
 #define ROTATION_CIRCUMFERENCE 65.312
+#define ROTATION_RADIUS 10.4
+#define RAD_TO_DEG 57.296
 
 #define MOVE_FORWARD 0
 #define MOVE_BACKWARD 1
@@ -32,6 +34,11 @@ class MotorController
     void moveBackward(double distance);
     void turnLeft(int degrees);
     void turnRight(int degrees);
+
+    void startVacuum();
+    void stopVacuum();
+    
+    void brake();
 
   private:
     List _commands;    

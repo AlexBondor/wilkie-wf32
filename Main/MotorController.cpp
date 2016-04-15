@@ -49,6 +49,10 @@ void MotorController::init()
   _rightMotorSpeed = 0;
   _leftMotorPWM = 0;
   _rightMotorPWM = 0;
+
+  // Set vacuum pump pin as output
+  pinMode(VACUUM_PIN, OUTPUT);
+  stopVacuum();
 }
 
 /*
@@ -108,6 +112,20 @@ void MotorController::process()
       doBrake();
       break;
   }
+}
+
+/*
+ * Removes all the queued commands and stops
+ * the robot
+ */
+void MotorController::brake()
+{
+  while(_commandsCount != 0)
+  {
+    _commands.removeFirst();
+    _commandsCount--;
+  }
+  doBrake();
 }
 
 /*
@@ -174,7 +192,8 @@ void MotorController::doTurnLeft()
   _rightMotorPosition = rightEncoder.getPosition();
 
   double average = (-_leftMotorPosition + _rightMotorPosition) / 2;
-  double degrees = (average * 360) / ROTATION_CIRCUMFERENCE;
+  double radians = average / ROTATION_RADIUS;
+  double degrees = radians * RAD_TO_DEG;
   
   if (degrees >= _commands.getFirstValue())
   {
@@ -197,7 +216,8 @@ void MotorController::doTurnRight()
   _rightMotorPosition = rightEncoder.getPosition();
 
   double average = (_leftMotorPosition - _rightMotorPosition) / 2;
-  double degrees = (average * 360) / ROTATION_CIRCUMFERENCE;
+  double radians = average / ROTATION_RADIUS;
+  double degrees = radians * RAD_TO_DEG;
   
   if (degrees >= _commands.getFirstValue())
   {
@@ -258,6 +278,16 @@ Point MotorController::getPosition()
 Point MotorController::getDirection()
 {
   return _direction;
+}
+
+void MotorController::startVacuum()
+{
+  digitalWrite(VACUUM_PIN, HIGH);
+}
+
+void MotorController::stopVacuum()
+{
+  digitalWrite(VACUUM_PIN, LOW);
 }
 
 

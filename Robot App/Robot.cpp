@@ -75,12 +75,12 @@ Robot::Robot()
   _motorController.init();
 
   // Set the callback methods for when the bluetooth module receives data
-  _bluetoothModule.setEnableRemoteControlCallbackMethod(enableRemoteControlCallback);
-  _bluetoothModule.setEnablePumpCallbackMethod(enablePumpCallback);
-  _bluetoothModule.setMoveForwardCallbackMethod(moveForwardCallback);
-  _bluetoothModule.setMoveBackwardCallbackMethod(moveBackwardCallback);
-  _bluetoothModule.setTurnLeftCallbackMethod(turnLeftCallback);
-  _bluetoothModule.setTurnRightCallbackMethod(turnRightCallback);
+  _bluetoothController.setEnableRemoteControlCallbackMethod(enableRemoteControlCallback);
+  _bluetoothController.setEnablePumpCallbackMethod(enablePumpCallback);
+  _bluetoothController.setMoveForwardCallbackMethod(moveForwardCallback);
+  _bluetoothController.setMoveBackwardCallbackMethod(moveBackwardCallback);
+  _bluetoothController.setTurnLeftCallbackMethod(turnLeftCallback);
+  _bluetoothController.setTurnRightCallbackMethod(turnRightCallback);
 }
 
 Point Robot::getPosition()
@@ -91,7 +91,7 @@ Point Robot::getPosition()
 void Robot::process()
 {
   _motorController.process();
-  _bluetoothModule.listen();
+  _bluetoothController.listen();
 }
 
 void Robot::moveForward(double distance)

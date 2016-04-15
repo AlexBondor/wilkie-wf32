@@ -1,15 +1,15 @@
-#ifndef BluetoothModule_h
-#define BluetoothModule_h
+#ifndef BluetoothController_h
+#define BluetoothController_h
 
 #include "Arduino.h"
-#include "Config.h"
+#include "../Config.h"
 
 // Bluetooth module uses Serial1 on pins 39, 40 on WF32
     
-class BluetoothModule
+class BluetoothController
 {
   public:
-    BluetoothModule();
+    BluetoothController();
     void listen();
     void setEnableRemoteControlCallbackMethod(VoidCallbackMethod);
     void setMoveForwardCallbackMethod(VoidCallbackMethod);

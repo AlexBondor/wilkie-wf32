@@ -1,14 +1,14 @@
-#include "BluetoothModule.h"
+#include "BluetoothController.h"
 
 char val = 0;
 
-BluetoothModule::BluetoothModule()
+BluetoothController::BluetoothController()
 {
   _last = 0;
   _isEnabled = false;
 }
 
-void BluetoothModule::listen()
+void BluetoothController::listen()
 {
   if (Serial1.available() > 0)
   {
@@ -51,32 +51,32 @@ void BluetoothModule::listen()
   }
 }
 
-void BluetoothModule::setEnableRemoteControlCallbackMethod(VoidCallbackMethod callback)
+void BluetoothController::setEnableRemoteControlCallbackMethod(VoidCallbackMethod callback)
 {
   _enableRemoteControlCallbackMethod = callback;
 }
 
-void BluetoothModule::setMoveForwardCallbackMethod(VoidCallbackMethod callback)
+void BluetoothController::setMoveForwardCallbackMethod(VoidCallbackMethod callback)
 {
   _moveForwardCallbackMethod = callback;
 }
 
-void BluetoothModule::setMoveBackwardCallbackMethod(VoidCallbackMethod callback)
+void BluetoothController::setMoveBackwardCallbackMethod(VoidCallbackMethod callback)
 {
   _moveBackwardCallbackMethod = callback;
 }
 
-void BluetoothModule::setTurnLeftCallbackMethod(VoidCallbackMethod callback)
+void BluetoothController::setTurnLeftCallbackMethod(VoidCallbackMethod callback)
 {
   _turnLeftCallbackMethod = callback;
 }
 
-void BluetoothModule::setTurnRightCallbackMethod(VoidCallbackMethod callback)
+void BluetoothController::setTurnRightCallbackMethod(VoidCallbackMethod callback)
 {
   _turnRightCallbackMethod = callback;
 }
 
-void BluetoothModule::setEnablePumpCallbackMethod(VoidCallbackMethod callback)
+void BluetoothController::setEnablePumpCallbackMethod(VoidCallbackMethod callback)
 {
   _enablePumpCallbackMethod = callback;
 }

@@ -3,8 +3,8 @@
 #define Robot_h
 
 #include "Arduino.h"
-#include "MotorController.h"
-#include "BluetoothModule.h"
+#include "Controller/MotorController.h"
+#include "Controller/BluetoothController.h"
 
 class Robot
 {
@@ -23,7 +23,7 @@ class Robot
   private:
     void resetFlags();
     MotorController _motorController;
-    BluetoothModule _bluetoothModule;
+    BluetoothController _bluetoothController;
 
     // Callbacks called by bluetooth module
     static void enableRemoteControlCallback();

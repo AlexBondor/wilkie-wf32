@@ -3,12 +3,12 @@
 #define MotorController_h
 
 #include "Arduino.h"
-#include "FuzzyController.h"
-#include "Motor.h"
-#include "Encoder.h"
-#include "Config.h"
-#include "Point.h"
-#include "List.h"
+#include "../Controller/FuzzyController.h"
+#include "../Component/Motor.h"
+#include "../Component/Encoder.h"
+#include "../Config.h"
+#include "../Util/Point.h"
+#include "../Util/List.h"
 
 // Circle length (cm) described by the robots' wheels 
 // when turning in place

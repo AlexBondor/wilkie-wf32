@@ -249,6 +249,11 @@ void MotorController::turnRight(int degrees)
   _commandsCount++;
 }
 
+/*
+ *  Based on the already existing fuzzy sets and taking the
+ *  encoders data as input, the fuzzy controller computes the
+ *  new output that needs to be written on the motors.
+ */
 void MotorController::fuzzyCompute()
 {
   _leftMotorSpeed = leftEncoder.getSpeed();

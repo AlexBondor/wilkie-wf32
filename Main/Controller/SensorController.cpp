@@ -15,6 +15,13 @@ SensorController::SensorController()
 	_sharpSensor3.attach(SHARP_3_PIN, 20);
 }
 
+/*
+ *	This method must be called every loop cycle in order
+ *	to make the servo on top of which the sensors are located.
+ *	As in the case of other peripherals, we make the call each loop
+ *	instead of waiting for it because we still want that other peripherals
+ *	get the CPU as well.. Sharing is caring!
+ */
 void SensorController::process()
 {
 	if (_freeMove)
@@ -48,6 +55,9 @@ void SensorController::setServoFreeMove(bool freeMove)
 	_freeMove = freeMove;
 }
 
+/*
+ *	Set the delay between servo steps in miliseconds
+ */
 void SensorController::setServoTurnDelay(int newTurnDelay)
 {
 	_myServoTurnDelay = newTurnDelay;

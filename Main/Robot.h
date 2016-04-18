@@ -22,11 +22,10 @@ class Robot
 		void brake();
 
 		// Wifi controller
-    void wifiProcess();
 		char** wifiScan(int &size);
 		bool connectToWifi(char* wifiName, char* password);
 		bool connectToServer(char* serverIp, int serverPort);
-    bool writeToServer(char* messageToWrite, int messageToWriteSize);
+    	bool writeToServer(char* messageToWrite, int messageToWriteSize);
 
 	private:
 		void resetFlags();

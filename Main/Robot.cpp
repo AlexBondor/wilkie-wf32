@@ -168,11 +168,6 @@ void Robot::updateMovement()
 /*
  *  Return a list of scanned networks
  */
-void Robot::wifiProcess()
-{
-	_wifiController.process();
-}
-
 char** Robot::wifiScan(int &size)
 {
   return _wifiController.scan(size);

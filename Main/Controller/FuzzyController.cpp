@@ -10,6 +10,11 @@
 #define RPM_ZERO 100
 #define RPM_STEP   5
 
+/*
+ *  Class written by taking the online eFLL library example as model.
+ *  The values of the fuzzy sets were determined by doing some physical
+ *  experiments.
+ */
 FuzzyController::FuzzyController()
 {
   _fuzzy = new Fuzzy();

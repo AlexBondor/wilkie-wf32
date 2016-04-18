@@ -8,6 +8,11 @@ BluetoothController::BluetoothController()
   _isEnabled = false;
 }
 
+/*
+ *  This method must be called every loop cycle in
+ *  order for the Bluetooth module to react to new
+ *  commands.
+ */
 void BluetoothController::listen()
 {
   if (Serial1.available() > 0)

@@ -24,6 +24,10 @@ int SharpSensor::getRaw()
   return raw;
 }
 
+/*
+ *  Returns the distance in cm if the sensor has
+ *  anything blocking its viewing ray. Returns 0 otherwise.
+ */
 float SharpSensor::getDistance()
 {
   _readingsCount = 0;

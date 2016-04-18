@@ -90,8 +90,9 @@ Point Robot::getPosition()
 
 void Robot::process()
 {
-  _motorController.process();
-  _bluetoothController.listen();
+  //_motorController.process();
+  //_bluetoothController.listen();
+  _wifiController.process();
 }
 
 void Robot::moveForward(double distance)
@@ -164,3 +165,30 @@ void Robot::updateMovement()
   }
 }
 
+/*
+ *  Return a list of scanned networks
+ */
+void Robot::wifiProcess()
+{
+	_wifiController.process();
+}
+
+char** Robot::wifiScan(int &size)
+{
+  return _wifiController.scan(size);
+}
+    
+bool Robot::connectToWifi(char* wifiName, char* password)
+{
+  return _wifiController.connectToWifi(wifiName, password);
+}
+
+bool Robot::connectToServer(char* serverIp, int serverPort)
+{
+  return _wifiController.connectToServer(serverIp, serverPort);
+}
+
+bool Robot::writeToServer(char* messageToWrite, int messageToWriteSize)
+{
+	return _wifiController.writeToServer(messageToWrite, messageToWriteSize);
+}

@@ -5,6 +5,7 @@
 #include <Servo.h>
 #include "../Component/SharpSensor.h"
 #include "../Config.h"
+#include "../Util/Point.h"
 
 // Starting position of the servo motor
 #define ZERO_POSITION 105
@@ -22,9 +23,12 @@ class SensorController
 		void setServoPosition(int newPosition);
 		void setServoFreeMove(bool freeMove);
 
-		float getSharpSensor1Data();
-		float getSharpSensor2Data();
-		float getSharpSensor3Data();
+		float getSharpSensor1RawData();
+		Point getSharpSensor1Data();
+		float getSharpSensor2RawData();
+		Point getSharpSensor2Data();
+		float getSharpSensor3RawData();
+		Point getSharpSensor3Data();
 
 	private:
 		Servo _myServo;

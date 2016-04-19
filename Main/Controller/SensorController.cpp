@@ -46,7 +46,7 @@ void SensorController::process()
 	}
 	else
 	{
-		_myServo.write(ZERO_POSITION);
+		_myServo.write(_myServoPosition);
 	}
 }
 
@@ -71,20 +71,53 @@ int SensorController::getServoPosition()
 void SensorController::setServoPosition(int newPosition)
 {
 	_myServoPosition = newPosition;
-	_myServo.write(_myServoPosition);
 }
-
-float SensorController::getSharpSensor1Data()
+/*
+ *	The distance returned by this method has the point of
+ *	origin the position of the IR receiver from the sensor
+ */
+float SensorController::getSharpSensor1RawData()
 {
 	return _sharpSensor1.getDistance();
 }
 
-float SensorController::getSharpSensor2Data()
+/*
+ *	Return a point seen by this sensor where the points' origin of
+ *	system of coordinates is the center of the robot
+ */
+Point SensorController::getSharpSensor1Data()
+{
+	Point myPoint;
+
+	myPoint.setX(int(_sharpSensor1.getDistance() * cos(-(_myServoPosition - 90) * 0.0174533)));
+	myPoint.setY(int(_sharpSensor1.getDistance() * sin(-(_myServoPosition - 90) * 0.0174533)));
+	return myPoint;
+}
+
+float SensorController::getSharpSensor2RawData()
 {
 	return _sharpSensor2.getDistance();
 }
 
-float SensorController::getSharpSensor3Data()
+Point SensorController::getSharpSensor2Data()
+{
+	Point myPoint;
+
+	myPoint.setX(int(_sharpSensor1.getDistance() * cos(-(_myServoPosition) * 0.0174533)));
+	myPoint.setY(int(_sharpSensor1.getDistance() * sin(-(_myServoPosition) * 0.0174533)));
+	return myPoint;
+}
+
+float SensorController::getSharpSensor3RawData()
 {
 	return _sharpSensor3.getDistance();
+}
+
+Point SensorController::getSharpSensor3Data()
+{
+	Point myPoint;
+
+	myPoint.setX(int(_sharpSensor1.getDistance() * cos(-(_myServoPosition + 90) * 0.0174533)));
+	myPoint.setY(int(_sharpSensor1.getDistance() * sin(-(_myServoPosition + 90) * 0.0174533)));
+	return myPoint;
 }

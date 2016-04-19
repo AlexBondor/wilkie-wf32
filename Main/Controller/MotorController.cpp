@@ -9,6 +9,12 @@ Encoder rightEncoder;
 
 FuzzyController fuzzyController;
 
+//#define MOTOR_CONTROLLER_DEBUG
+
+#ifdef MOTOR_CONTROLLER_DEBUG
+#define DEBUG_PWM 70
+#endif
+
 /*
  * Empty constructor
  */
@@ -184,7 +190,7 @@ void MotorController::doMoveBackward()
  */
 void MotorController::doTurnLeft()
 {
-  fuzzyMove(-0.5, 0.5);
+  fuzzyMove(-0.8, 0.8);
 
   // When moving in place half down the speed of the motors
   // as they compose because they're moving in different directions
@@ -210,7 +216,7 @@ void MotorController::doTurnRight()
 {
   // When moving in place half down the speed of the motors
   // as they compose because they're moving in different directions
-  fuzzyMove(0.5, -0.5);
+  fuzzyMove(0.8, -0.8);
 
   _leftMotorPosition = leftEncoder.getPosition();
   _rightMotorPosition = rightEncoder.getPosition();
@@ -256,6 +262,17 @@ void MotorController::turnRight(int degrees)
  */
 void MotorController::fuzzyCompute()
 {
+
+  #ifdef MOTOR_CONTROLLER_DEBUG
+  _leftMotorSpeed = leftEncoder.getSpeed();
+  _rightMotorSpeed = rightEncoder.getSpeed();
+  Serial.print("Left motor speed: ");
+  Serial.print(_leftMotorSpeed);
+  Serial.print(" Right motor speed: ");
+  Serial.println(_rightMotorSpeed);
+  _leftMotorPWM = DEBUG_PWM;
+  _rightMotorPWM = DEBUG_PWM;
+  #else
   _leftMotorSpeed = leftEncoder.getSpeed();
   fuzzyController.setInput(1, _leftMotorSpeed);
   fuzzyController.fuzzify();
@@ -264,13 +281,21 @@ void MotorController::fuzzyCompute()
   _rightMotorSpeed = rightEncoder.getSpeed();
   fuzzyController.setInput(1, _rightMotorSpeed);
   fuzzyController.fuzzify();
-  _rightMotorPWM = fuzzyController.defuzzify(1);
+  _rightMotorPWM = fuzzyController.defuzzify(1);  
+  #endif
 }
 
 void MotorController::fuzzyMove(double left, double right)
 {
   fuzzyCompute();
   
+  #ifdef MOTOR_CONTROLLER_DEBUG
+  Serial.print("Left motor PWM: ");
+  Serial.print(_leftMotorPWM);
+  Serial.print(" Right motor PWM: ");
+  Serial.println(_rightMotorPWM);
+  Serial.println("");
+  #endif
   leftMotor.turn(_leftMotorPWM * left);
   rightMotor.turn(_rightMotorPWM * right);
 }

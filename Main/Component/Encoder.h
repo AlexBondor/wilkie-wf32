@@ -56,7 +56,7 @@
 #define INT_PER_REVOLUTION 159
 
 // Robot wheel circumference in cm
-#define WHEEL_CIRCUMFERENCE 10.05
+#define WHEEL_CIRCUMFERENCE 13.19
 
 typedef struct 
 {

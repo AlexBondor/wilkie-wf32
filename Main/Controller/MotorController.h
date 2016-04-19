@@ -12,9 +12,9 @@
 
 // Circle length (cm) described by the robots' wheels 
 // when turning in place
-// Given that the distance between wheel is 20.8 cm
-#define ROTATION_CIRCUMFERENCE 65.312
-#define ROTATION_RADIUS 10.4
+// Given that the distance between wheel is 20.5 cm
+#define ROTATION_CIRCUMFERENCE 64.4
+#define ROTATION_RADIUS 10.25
 #define RAD_TO_DEG 57.296
 
 #define MOVE_FORWARD 0

@@ -6,12 +6,16 @@
 #include "Controller/MotorController.h"
 #include "Controller/BluetoothController.h"
 #include "Controller/WifiController.h"
+#include "Controller/SensorController.h"
+#include "Util/Point.h"
 
 class Robot
 {
 	public:
 		Robot();
 		void process();
+
+		// Motor controller
 		Point getPosition();
 		void moveForward(double distance);
 		void moveBackward(double distance);
@@ -25,11 +29,22 @@ class Robot
 		char** wifiScan(int &size);
 		bool connectToWifi(char* wifiName, char* password);
 		bool connectToServer(char* serverIp, int serverPort);
-    	bool writeToServer(char* messageToWrite, int messageToWriteSize);
+  		bool writeToServer(char* messageToWrite, int messageToWriteSize);
+
+  		// Sensor controller
+  		void startSensorsServo();
+  		void stopSensorsServo();
+  		float getLeftEyeRawData();
+  		Point getLeftEyeData();
+  		float getFrontEyeRawData();
+  		Point getFrontEyeData();
+  		float getRightEyeRawData();
+  		Point getRightEyeData();
 
 	private:
 		void resetFlags();
 		MotorController _motorController;
+		SensorController _sensorController;
 		BluetoothController _bluetoothController;
 		WifiController _wifiController;
 

@@ -9,6 +9,15 @@ static bool _moveBackwardFlag;
 static bool _turnLeftFlag;
 static bool _turnRightFlag;
 
+
+void Robot::process()
+{
+  _motorController.process();
+  _sensorController.process();
+  _bluetoothController.listen();
+  _wifiController.process();
+}
+
 // Callback methods called by bluetooth module
 void Robot::enableRemoteControlCallback()
 {
@@ -86,13 +95,6 @@ Robot::Robot()
 Point Robot::getPosition()
 {
   return _motorController.getPosition();
-}
-
-void Robot::process()
-{
-  //_motorController.process();
-  //_bluetoothController.listen();
-  _wifiController.process();
 }
 
 void Robot::moveForward(double distance)
@@ -186,4 +188,47 @@ bool Robot::connectToServer(char* serverIp, int serverPort)
 bool Robot::writeToServer(char* messageToWrite, int messageToWriteSize)
 {
 	return _wifiController.writeToServer(messageToWrite, messageToWriteSize);
+}
+
+/*
+ *  Sensors controller methods
+ */
+void Robot::startSensorsServo()
+{
+  _sensorController.setServoFreeMove(true);
+}
+
+void Robot::stopSensorsServo()
+{
+  _sensorController.setServoFreeMove(false);
+}
+
+float Robot::getLeftEyeRawData()
+{
+  return _sensorController.getSharpSensor1RawData();
+}
+
+Point Robot::getLeftEyeData()
+{
+  return _sensorController.getSharpSensor1Data();
+}
+
+float Robot::getFrontEyeRawData()
+{
+  return _sensorController.getSharpSensor2RawData();
+}
+
+Point Robot::getFrontEyeData()
+{
+  return _sensorController.getSharpSensor2Data();
+}
+
+float Robot::getRightEyeRawData()
+{
+  return _sensorController.getSharpSensor3RawData();
+}
+
+Point Robot::getRightEyeData()
+{
+  return _sensorController.getSharpSensor3Data();
 }

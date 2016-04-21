@@ -50,11 +50,12 @@ class Robot
 
 		// Callbacks called by bluetooth module
 		static void enableRemoteControlCallback();
-		static void enablePumpCallback();
 		static void moveForwardCallback();
 		static void moveBackwardCallback();
 		static void turnLeftCallback();
 		static void turnRightCallback();
+		static void enablePumpCallback();
+		static void enableServoFreeMoveCallback();
 
 		void updateMovement();
 };

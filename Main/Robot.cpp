@@ -3,11 +3,12 @@
 
 static Robot* instance;
 static bool _enableRemoteControlFlag;
-static bool _enablePumpFlag;
 static bool _moveForwardFlag;
 static bool _moveBackwardFlag;
 static bool _turnLeftFlag;
 static bool _turnRightFlag;
+static bool _enablePumpFlag;
+static bool _enableServoFreeMoveFlag;
 
 
 void Robot::process()
@@ -24,19 +25,6 @@ void Robot::enableRemoteControlCallback()
   instance->resetFlags();
   _enableRemoteControlFlag = !_enableRemoteControlFlag;
   instance->updateMovement();
-}
-
-void Robot::enablePumpCallback()
-{
-  _enablePumpFlag = !_enablePumpFlag;
-  if (_enablePumpFlag)
-  {
-    instance->startVacuum();
-  }
-  else
-  {
-    instance->stopVacuum();
-  }
 }
 
 void Robot::moveForwardCallback()
@@ -67,6 +55,32 @@ void Robot::turnRightCallback()
   instance->updateMovement();
 }
 
+void Robot::enablePumpCallback()
+{
+  _enablePumpFlag = !_enablePumpFlag;
+  if (_enablePumpFlag)
+  {
+    instance->startVacuum();
+  }
+  else
+  {
+    instance->stopVacuum();
+  }
+}
+
+void Robot::enableServoFreeMoveCallback()
+{
+  _enableServoFreeMoveFlag = !_enableServoFreeMoveFlag;
+  if (_enableServoFreeMoveFlag)
+  {
+    instance->startSensorsServo();
+  }
+  else
+  {
+    instance->stopSensorsServo();
+  }
+}
+
 /*
  * Robot constructor
  */
@@ -74,22 +88,24 @@ Robot::Robot()
 {
   instance = this;
   _enableRemoteControlFlag = false;
-  _enablePumpFlag = false;
   _moveForwardFlag = false;
   _moveBackwardFlag = false;
   _turnLeftFlag = false;
   _turnRightFlag = false;
+  _enablePumpFlag = false;
+  _enableServoFreeMoveFlag = false;
   
   // Initialize motor controller
   _motorController.init();
 
   // Set the callback methods for when the bluetooth module receives data
   _bluetoothController.setEnableRemoteControlCallbackMethod(enableRemoteControlCallback);
-  _bluetoothController.setEnablePumpCallbackMethod(enablePumpCallback);
   _bluetoothController.setMoveForwardCallbackMethod(moveForwardCallback);
   _bluetoothController.setMoveBackwardCallbackMethod(moveBackwardCallback);
   _bluetoothController.setTurnLeftCallbackMethod(turnLeftCallback);
   _bluetoothController.setTurnRightCallbackMethod(turnRightCallback);
+  _bluetoothController.setEnablePumpCallbackMethod(enablePumpCallback);
+  _bluetoothController.setEnableServoFreeMoveCallbackMethod(enableServoFreeMoveCallback);
 }
 
 Point Robot::getPosition()

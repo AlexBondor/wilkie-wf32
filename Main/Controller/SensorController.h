@@ -6,9 +6,12 @@
 #include "../Component/SharpSensor.h"
 #include "../Config.h"
 #include "../Util/Point.h"
+#include "../Util/Consts.h"
 
 // Starting position of the servo motor
 #define ZERO_POSITION 105
+// NINETY_OFFSET = ZERO_POSITION - 90
+#define NINETY_OFFSET 15
 // Angle in degrees the motor turns in both directions
 #define ROTATION_ANGLE 60
 

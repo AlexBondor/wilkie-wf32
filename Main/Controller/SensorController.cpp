@@ -2,7 +2,7 @@
 
 SensorController::SensorController()
 {
-	_myServoTurnDelay = 10;
+	_myServoTurnDelay = 20;
 	_myServoPosition = ZERO_POSITION;
 	_freeMove = false;
 	_myServoDirection = 1;
@@ -41,18 +41,15 @@ void SensorController::process()
 
 			_myServoPosition += _myServoDirection;
 			setServoPosition(_myServoPosition);
-
 		}		
 	}
-	else
-	{
-		_myServo.write(_myServoPosition);
-	}
+	_myServo.write(_myServoPosition);
 }
 
 void SensorController::setServoFreeMove(bool freeMove)
 {
 	_freeMove = freeMove;
+	_startTime = millis();
 }
 
 /*
@@ -89,8 +86,8 @@ Point SensorController::getSharpSensor1Data()
 {
 	Point myPoint;
 
-	myPoint.setX(int(_sharpSensor1.getDistance() * cos(-(_myServoPosition - 90) * 0.0174533)));
-	myPoint.setY(int(_sharpSensor1.getDistance() * sin(-(_myServoPosition - 90) * 0.0174533)));
+	myPoint.setX(round(_sharpSensor1.getDistance() * COS[(_myServoPosition + 90 - NINETY_OFFSET) % 360]));
+	myPoint.setY(round(_sharpSensor1.getDistance() * SIN[(_myServoPosition + 90 - NINETY_OFFSET) % 360]));
 	return myPoint;
 }
 
@@ -103,8 +100,8 @@ Point SensorController::getSharpSensor2Data()
 {
 	Point myPoint;
 
-	myPoint.setX(int(_sharpSensor1.getDistance() * cos(-(_myServoPosition) * 0.0174533)));
-	myPoint.setY(int(_sharpSensor1.getDistance() * sin(-(_myServoPosition) * 0.0174533)));
+	myPoint.setX(round(_sharpSensor2.getDistance() * COS[(_myServoPosition - NINETY_OFFSET) % 360]));
+	myPoint.setY(round(_sharpSensor2.getDistance() * SIN[(_myServoPosition - NINETY_OFFSET) % 360]));
 	return myPoint;
 }
 
@@ -117,7 +114,7 @@ Point SensorController::getSharpSensor3Data()
 {
 	Point myPoint;
 
-	myPoint.setX(int(_sharpSensor1.getDistance() * cos(-(_myServoPosition + 90) * 0.0174533)));
-	myPoint.setY(int(_sharpSensor1.getDistance() * sin(-(_myServoPosition + 90) * 0.0174533)));
+	myPoint.setX(round(_sharpSensor3.getDistance() * COS[(_myServoPosition - 90 - NINETY_OFFSET) % 360]));
+	myPoint.setY(round(_sharpSensor3.getDistance() * SIN[(_myServoPosition - 90 - NINETY_OFFSET) % 360]));
 	return myPoint;
 }

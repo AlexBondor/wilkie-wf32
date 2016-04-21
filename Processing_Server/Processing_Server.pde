@@ -32,14 +32,14 @@ void draw()
   String whatClientSaid = myClient.readString();
   if (whatClientSaid != null) {
     whatClientSaid = trim(whatClientSaid);
-    println(myClient.ip() + ": " + whatClientSaid);
+    println(myClient.ip() + ": " + whatClientSaid + "|");
     
     myServer.write(1);
     
     stroke(255, 0, 0);
     points = split(whatClientSaid, ',');
-    for (int i = 0; i < points.length; i = i + 2) {
-      point(width / 2 + Integer.parseInt(points[i]), height / 2 - Integer.parseInt(points[i + 1]));
+    for (int i = 0; i < points.length - 1; i = i + 2) {
+     point(width / 2 + Integer.parseInt(points[i]), height / 2 - Integer.parseInt(points[i + 1]));
     }
   }
 }

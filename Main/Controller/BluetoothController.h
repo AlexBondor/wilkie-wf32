@@ -17,16 +17,18 @@ class BluetoothController
     void setTurnLeftCallbackMethod(VoidCallbackMethod);
     void setTurnRightCallbackMethod(VoidCallbackMethod);
     void setEnablePumpCallbackMethod(VoidCallbackMethod);
+    void setEnableServoFreeMoveCallbackMethod(VoidCallbackMethod);
     
   private:
     int _last;
     bool _isEnabled;
     VoidCallbackMethod _enableRemoteControlCallbackMethod;
-    VoidCallbackMethod _enablePumpCallbackMethod;
     VoidCallbackMethod _moveForwardCallbackMethod;
     VoidCallbackMethod _moveBackwardCallbackMethod;
     VoidCallbackMethod _turnLeftCallbackMethod;
     VoidCallbackMethod _turnRightCallbackMethod;
+    VoidCallbackMethod _enablePumpCallbackMethod;
+    VoidCallbackMethod _enableServoFreeMoveCallbackMethod;
 };
 
 #endif

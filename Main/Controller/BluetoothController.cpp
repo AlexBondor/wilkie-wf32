@@ -50,6 +50,10 @@ void BluetoothController::listen()
         {
           _enablePumpCallbackMethod();
         }
+        if (_last == 6)
+        {
+          _enableServoFreeMoveCallbackMethod();
+        }
       }
     }  
     _last = val;
@@ -86,3 +90,7 @@ void BluetoothController::setEnablePumpCallbackMethod(VoidCallbackMethod callbac
   _enablePumpCallbackMethod = callback;
 }
 
+void BluetoothController::setEnableServoFreeMoveCallbackMethod(VoidCallbackMethod callback)
+{
+  _enableServoFreeMoveCallbackMethod = callback;
+}

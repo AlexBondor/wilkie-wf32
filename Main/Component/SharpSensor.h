@@ -15,7 +15,8 @@ class SharpSensor
     int _pin;
     int _avg;
     int _readingsCount;
-    int* _readings;
+    int _lastIndex;
+    int _readings[50];
     void sort(int* readings);    
 };
 

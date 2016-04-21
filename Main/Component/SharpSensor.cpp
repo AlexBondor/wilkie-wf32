@@ -2,7 +2,8 @@
 
 SharpSensor::SharpSensor()
 {
-  _readings = new int(50);
+  _readingsCount = 0;
+  _lastIndex = 0;
 }
 
 void SharpSensor::attach(int pin, int avg)
@@ -30,23 +31,16 @@ int SharpSensor::getRaw()
  */
 float SharpSensor::getDistance()
 {
-  _readingsCount = 0;
-
-  for (int i = 0; i < _avg; i++)
+  _readings[_readingsCount] = getRaw();
+  _readingsCount += 1;
+  if (_readingsCount >= _avg)
   {
-    _readings[_readingsCount++] = getRaw();
+    //sort(_readings);
+    _lastIndex = _readings[_avg / 2] - MIN_RAW;
+    _readingsCount = 0;
   }
 
-  sort(_readings);
-
-  int x = _readings[_avg / 2] - MIN_RAW;
-
-  if (x < 0)
-  {
-    return 0;
-  }
-
-  return RAW_TO_CM[x][1];
+  return RAW_TO_CM[_lastIndex][1];
 }
 
 void SharpSensor::sort(int* readings)

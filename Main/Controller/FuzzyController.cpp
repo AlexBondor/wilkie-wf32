@@ -2,12 +2,12 @@
 
 #define PWM_MIN   50
 #define PWM_MAX  255
-#define PWM_ZERO  70
-#define PWM_STEP  10
+#define PWM_ZERO  60
+#define PWM_STEP   5
 
 #define RPM_MIN    0
 #define RPM_MAX  250
-#define RPM_ZERO 100
+#define RPM_ZERO  60
 #define RPM_STEP   5
 
 /*

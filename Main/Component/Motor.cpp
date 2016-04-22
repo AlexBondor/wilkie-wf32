@@ -51,8 +51,8 @@ void Motor::turn(int speed)
 */
 void Motor::brake()
 {
+  analogWrite(_pwmPin, 255);
 	digitalWrite(_directionPinA, LOW);
 	digitalWrite(_directionPinB, LOW);
-	analogWrite(_pwmPin, 0);
 }
 

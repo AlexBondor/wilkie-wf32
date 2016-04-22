@@ -113,6 +113,11 @@ Point Robot::getPosition()
   return _motorController.getPosition();
 }
 
+double Robot::getHeading()
+{
+  return _motorController.getHeading();
+}
+
 void Robot::moveForward(double distance)
 {
   _motorController.moveForward(distance);
@@ -167,19 +172,19 @@ void Robot::updateMovement()
   _motorController.brake();
   if (_moveForwardFlag)
   {
-    moveForward(100);
+    moveForward(50);
   }
   if (_moveBackwardFlag)
   {
-    moveBackward(100);    
+    moveBackward(50);    
   }
   if (_turnLeftFlag)
   {
-    turnLeft(360);
+    turnLeft(90);
   }
   if (_turnRightFlag)
   {
-    turnRight(360);
+    turnRight(90);
   }
 }
 

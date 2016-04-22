@@ -17,6 +17,7 @@ class Robot
 
 		// Motor controller
 		Point getPosition();
+		double getHeading();
 		void moveForward(double distance);
 		void moveBackward(double distance);
 		void turnLeft(int degrees);

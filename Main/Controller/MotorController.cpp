@@ -23,7 +23,7 @@ MotorController::MotorController()
 }
 
 /*
- * Updates the fields of current motor and sets the direction
+ * Updates the fields of current motor and sets the Heading
  * of its pins
  */
 void MotorController::init()
@@ -42,15 +42,16 @@ void MotorController::init()
   _position.setY(0);
 
   // Suppose robot is heading along Y axis
-  _direction.setX(0);
-  _direction.setY(1);
+  _heading = 90;
 
   // Initialize the number of commands to 0
   _commandsCount = 0;
   _processingNewCommand = true;
   
   _leftMotorPosition = 0;
+  _leftMotorLastPosition = 0;
   _rightMotorPosition = 0;
+  _rightMotorLastPosition = 0;
   _leftMotorSpeed = 0;
   _rightMotorSpeed = 0;
   _leftMotorPWM = 0;
@@ -70,7 +71,6 @@ void MotorController::process()
   // No commands to process
   if (_commandsCount == 0)
   {
-    _processingNewCommand = true;
     // Stop the robot
     doBrake();
     return;
@@ -84,7 +84,6 @@ void MotorController::process()
   // Command successfully executed
   if (value <= 0)
   {
-    _processingNewCommand = true;
     _commands.removeFirst();
     _commandsCount--;
     doBrake();
@@ -96,8 +95,8 @@ void MotorController::process()
   if (_processingNewCommand)
   {
     _processingNewCommand = false;
-    leftEncoder.resetPosition();
-    rightEncoder.resetPosition();
+    _leftMotorPosition = 0;
+    _rightMotorPosition = 0;
   }
   
   switch(id)
@@ -139,6 +138,7 @@ void MotorController::brake()
  */
 void MotorController::doBrake()
 {
+    _processingNewCommand = true;
     leftMotor.brake();
     rightMotor.brake();  
 }
@@ -152,8 +152,10 @@ void MotorController::doMoveForward()
 {
   fuzzyMove(1, 1);
 
-  _leftMotorPosition = leftEncoder.getPosition();
-  _rightMotorPosition = rightEncoder.getPosition();
+  _leftMotorPosition += leftEncoder.getPosition() - _leftMotorLastPosition;
+  _rightMotorPosition += rightEncoder.getPosition() - _rightMotorLastPosition;
+
+  updatePositionAndHeading(1);
 
   double average = (_leftMotorPosition + _rightMotorPosition) / 2;
 
@@ -172,12 +174,14 @@ void MotorController::doMoveBackward()
 {
   fuzzyMove(-1, -1);
 
-  _leftMotorPosition = leftEncoder.getPosition();
-  _rightMotorPosition = rightEncoder.getPosition();
+  _leftMotorPosition += _leftMotorLastPosition - leftEncoder.getPosition();
+  _rightMotorPosition += _rightMotorLastPosition - rightEncoder.getPosition();
+
+  updatePositionAndHeading(2);
 
   double average = (_leftMotorPosition + _rightMotorPosition) / 2;
 
-  if (-average >= _commands.getFirstValue())
+  if (average >= _commands.getFirstValue())
   {
     _commands.updateFirstValue(0);
   }
@@ -190,12 +194,14 @@ void MotorController::doMoveBackward()
  */
 void MotorController::doTurnLeft()
 {
-  fuzzyMove(-0.8, 0.8);
+  fuzzyMove(-1, 1);
 
   // When moving in place half down the speed of the motors
-  // as they compose because they're moving in different directions
-  _leftMotorPosition = leftEncoder.getPosition();
-  _rightMotorPosition = rightEncoder.getPosition();
+  // as they compose because they're moving in different Headings
+  _leftMotorPosition += leftEncoder.getPosition() - _leftMotorLastPosition;
+  _rightMotorPosition += rightEncoder.getPosition() - _rightMotorLastPosition;
+
+  updatePositionAndHeading(3);
 
   double average = (-_leftMotorPosition + _rightMotorPosition) / 2;
   double radians = average / ROTATION_RADIUS;
@@ -215,11 +221,13 @@ void MotorController::doTurnLeft()
 void MotorController::doTurnRight()
 {
   // When moving in place half down the speed of the motors
-  // as they compose because they're moving in different directions
-  fuzzyMove(0.8, -0.8);
+  // as they compose because they're moving in different Headings
+  fuzzyMove(1, -1);
 
-  _leftMotorPosition = leftEncoder.getPosition();
-  _rightMotorPosition = rightEncoder.getPosition();
+  _leftMotorPosition += leftEncoder.getPosition() - _leftMotorLastPosition;
+  _rightMotorPosition += rightEncoder.getPosition() - _rightMotorLastPosition;
+
+  updatePositionAndHeading(4);
 
   double average = (_leftMotorPosition - _rightMotorPosition) / 2;
   double radians = average / ROTATION_RADIUS;
@@ -305,9 +313,9 @@ Point MotorController::getPosition()
   return _position;
 }
 
-Point MotorController::getDirection()
+double MotorController::getHeading()
 {
-  return _direction;
+  return _heading;
 }
 
 void MotorController::startVacuum()
@@ -320,4 +328,67 @@ void MotorController::stopVacuum()
   digitalWrite(VACUUM_PIN, LOW);
 }
 
+/*
+ *  motionType parameter:
+ *  1 - move forward
+ *  2 - move backward
+ *  3 - turn left
+ *  4 - turn right
+ */
+void MotorController::updatePositionAndHeading(int motionType)
+{
+  double leftMotorPositionDelta = leftEncoder.getPosition() - _leftMotorLastPosition;
+  double rightMotorPositionDelta = rightEncoder.getPosition() - _rightMotorLastPosition;
 
+  _leftMotorLastPosition = leftEncoder.getPosition();
+  _rightMotorLastPosition = rightEncoder.getPosition();
+
+  double deltaPosition = (leftMotorPositionDelta + rightMotorPositionDelta) / 2;
+
+  if (motionType == 1 || motionType == 2)
+  {
+    _position.setX(_position.getX() + deltaPosition * COS[round(_heading)]);
+    _position.setY(_position.getY() + deltaPosition * SIN[round(_heading)]);
+
+    // If robot turns slightly to left when moving forward or backward
+    if (leftMotorPositionDelta < rightMotorPositionDelta)
+    {
+      double average = rightMotorPositionDelta - leftMotorPositionDelta;
+      double radians = average / ROTATION_CIRCUMFERENCE;
+      double degrees = radians * RAD_TO_DEG;   
+
+      // _heading = motionType == 1 ? _heading + degrees : _heading - degrees;
+    }
+    else
+    {
+      double average = leftMotorPositionDelta - rightMotorPositionDelta;
+      double radians = average / ROTATION_CIRCUMFERENCE;
+      double degrees = radians * RAD_TO_DEG;   
+
+      // _heading = motionType == 1 ? _heading - degrees : _heading + degrees;
+    }
+  }
+  else
+  {
+    // Robot turns left
+    if (motionType == 3)
+    {
+      double average = (rightMotorPositionDelta - leftMotorPositionDelta) / 2;
+      double radians = average / ROTATION_RADIUS;
+      double degrees = radians * RAD_TO_DEG;
+
+      _heading += degrees;
+    }
+    else
+    {
+      double average = (leftMotorPositionDelta - rightMotorPositionDelta) / 2;
+      double radians = average / ROTATION_RADIUS;
+      double degrees = radians * RAD_TO_DEG;
+
+      _heading -= degrees;
+    }
+  }
+  _heading = _heading < 0 ? 360 + _heading : _heading;
+  _heading = _heading > 360 ? _heading - 360 : _heading;
+  Serial.println(_heading);
+}

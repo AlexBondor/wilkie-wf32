@@ -310,7 +310,11 @@ void MotorController::fuzzyMove(double left, double right)
 
 Point MotorController::getPosition()
 {
-  return _position;
+  Point centerPosition;
+  centerPosition.setX(_position.getX() + COS[(int)_heading] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
+  centerPosition.setY(_position.getY() + SIN[(int)_heading] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
+
+  return centerPosition;
 }
 
 double MotorController::getHeading()

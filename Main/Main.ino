@@ -2,6 +2,8 @@
 
 Robot robot;
 
+char px[10], py[10];
+char h[10];
 char xs1[10], ys1[10];
 char xs2[10], ys2[10];
 char xs3[10], ys3[10];
@@ -27,43 +29,30 @@ void setup()
 
 void loop()
 {
-  //robot.writeToServer("10", 2);
   robot.process();
-  // sprintf(xs1, "%d", (int)robot.getLeftEyeData().getX());
-  // sprintf(ys1, "%d", (int)robot.getLeftEyeData().getY());
-  // sprintf(xs2, "%d", (int)robot.getFrontEyeData().getX());
-  // sprintf(ys2, "%d", (int)robot.getFrontEyeData().getY());
-  // sprintf(xs3, "%d", (int)robot.getRightEyeData().getX());
-  // sprintf(ys3, "%d", (int)robot.getRightEyeData().getY());
   if (millis() - start > 100)
   {
     start = millis();
-    sprintf(xs1, "%d", (int)robot.getPosition().getX());
-    sprintf(ys1, "%d", (int)robot.getPosition().getY());
-    sprintf(xs2, "h%d", (int)robot.getHeading());
-    sprintf(ys2, "h%d", (int)robot.getHeading());
+    sprintf(xs1, "%d", (int)robot.getLeftEyeData().getX());
+    sprintf(ys1, "%d", (int)robot.getLeftEyeData().getY());
+    sprintf(xs2, "%d", (int)robot.getFrontEyeData().getX());
+    sprintf(ys2, "%d", (int)robot.getFrontEyeData().getY());
+    sprintf(xs3, "%d", (int)robot.getRightEyeData().getX());
+    sprintf(ys3, "%d", (int)robot.getRightEyeData().getY());
+    sprintf(px, "p%d", (int)robot.getPosition().getX());
+    sprintf(py, "p%d", (int)robot.getPosition().getY());
+    sprintf(h, "h%d", (int)robot.getHeading());
+    sprintf(h, "h%d", (int)robot.getHeading());
     robot.writeToServer(xs1, strlen(xs1));
     robot.writeToServer(ys1, strlen(ys1));
     robot.writeToServer(xs2, strlen(xs2));
     robot.writeToServer(ys2, strlen(ys2));
-    // robot.writeToServer(xs2, strlen(xs2));
-    // robot.writeToServer(ys2, strlen(ys2));
-    // robot.writeToServer(xs3, strlen(xs3));
-    // robot.writeToServer(ys3, strlen(ys3));
+    robot.writeToServer(xs3, strlen(xs3));
+    robot.writeToServer(ys3, strlen(ys3));
+    robot.writeToServer(px, strlen(px));
+    robot.writeToServer(py, strlen(py));
+    robot.writeToServer(h, strlen(h));
+    robot.writeToServer(h, strlen(h));
   }
-  // delay(20);
-  // delay(100);
-  // Serial.print(robot.getLeftEyeData().getX());
-  // Serial.print(" ");
-  // Serial.println(robot.getLeftEyeData().getY());
-  // Serial.println("-----------------------");
-  // Serial.print(robot.getFrontEyeData().getX());
-  // Serial.print(" ");
-  // Serial.println(robot.getFrontEyeData().getY());
-  // Serial.println("-----------------------");
-  // Serial.print(robot.getRightEyeData().getX());
-  // Serial.print(" ");
-  // Serial.println(robot.getRightEyeData().getY());
-  // Serial.println("+++++++++++++++++++++++");
 }
 

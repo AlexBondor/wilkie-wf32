@@ -23,6 +23,10 @@
 #define TURN_RIGHT 2
 #define TURN_LEFT 3
 
+// The distance between the middle of the robot to the center
+// in between the two wheels in cm
+#define WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET 8.6
+
 class MotorController
 {
   public:

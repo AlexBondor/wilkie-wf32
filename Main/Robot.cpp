@@ -172,11 +172,11 @@ void Robot::updateMovement()
   _motorController.brake();
   if (_moveForwardFlag)
   {
-    moveForward(50);
+    moveForward(10);
   }
   if (_moveBackwardFlag)
   {
-    moveBackward(50);    
+    moveBackward(10);    
   }
   if (_turnLeftFlag)
   {

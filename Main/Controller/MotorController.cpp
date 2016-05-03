@@ -311,6 +311,7 @@ void MotorController::fuzzyMove(double left, double right)
 Point MotorController::getPosition()
 {
   Point centerPosition;
+  
   centerPosition.setX(_position.getX() + COS[(int)_heading] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
   centerPosition.setY(_position.getY() + SIN[(int)_heading] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
 
@@ -355,22 +356,22 @@ void MotorController::updatePositionAndHeading(int motionType)
     _position.setY(_position.getY() + deltaPosition * SIN[round(_heading)]);
 
     // If robot turns slightly to left when moving forward or backward
-    if (leftMotorPositionDelta < rightMotorPositionDelta)
-    {
-      double average = rightMotorPositionDelta - leftMotorPositionDelta;
-      double radians = average / ROTATION_CIRCUMFERENCE;
-      double degrees = radians * RAD_TO_DEG;   
+    // if (leftMotorPositionDelta < rightMotorPositionDelta)
+    // {
+    //   double average = rightMotorPositionDelta - leftMotorPositionDelta;
+    //   double radians = average / ROTATION_CIRCUMFERENCE;
+    //   double degrees = radians * RAD_TO_DEG;   
 
-      // _heading = motionType == 1 ? _heading + degrees : _heading - degrees;
-    }
-    else
-    {
-      double average = leftMotorPositionDelta - rightMotorPositionDelta;
-      double radians = average / ROTATION_CIRCUMFERENCE;
-      double degrees = radians * RAD_TO_DEG;   
+    //   // _heading = motionType == 1 ? _heading + degrees : _heading - degrees;
+    // }
+    // else
+    // {
+    //   double average = leftMotorPositionDelta - rightMotorPositionDelta;
+    //   double radians = average / ROTATION_CIRCUMFERENCE;
+    //   double degrees = radians * RAD_TO_DEG;   
 
-      // _heading = motionType == 1 ? _heading - degrees : _heading + degrees;
-    }
+    //   // _heading = motionType == 1 ? _heading - degrees : _heading + degrees;
+    // }
   }
   else
   {

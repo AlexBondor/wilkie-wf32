@@ -311,9 +311,9 @@ void MotorController::fuzzyMove(double left, double right)
 Point MotorController::getPosition()
 {
   Point centerPosition;
-  
-  centerPosition.setX(_position.getX() + COS[(int)_heading] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
-  centerPosition.setY(_position.getY() + SIN[(int)_heading] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
+
+  centerPosition.setX(_position.getX() + COS[round(_heading)] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
+  centerPosition.setY(_position.getY() + SIN[round(_heading)] * WHEELS_CENTER_TO_ROBOT_CENTER_OFFSET);
 
   return centerPosition;
 }
@@ -395,5 +395,4 @@ void MotorController::updatePositionAndHeading(int motionType)
   }
   _heading = _heading < 0 ? 360 + _heading : _heading;
   _heading = _heading > 360 ? _heading - 360 : _heading;
-  Serial.println(_heading);
 }

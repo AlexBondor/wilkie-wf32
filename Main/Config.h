@@ -33,3 +33,5 @@
 // Used by bluetooth module to do callbacks when receives data from 
 // app
 typedef void (*VoidCallbackMethod)();
+
+#define IIC_SLAVE_ADDRESS 8

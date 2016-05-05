@@ -27,6 +27,8 @@ typedef enum
 class WifiController
 {
 	public:
+    WifiController();
+    void doSomething();
 		char** scan(int &size);
 		void process();
 		bool connectToWifi(char* wifiName, char* password);

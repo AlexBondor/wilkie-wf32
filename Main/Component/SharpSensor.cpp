@@ -35,7 +35,7 @@ float SharpSensor::getDistance()
   _readingsCount += 1;
   if (_readingsCount >= _avg)
   {
-    //sort(_readings);
+    sort(_readings);
     _lastIndex = _readings[_avg / 2] - MIN_RAW;
     _readingsCount = 0;
   }

@@ -39,8 +39,8 @@ float SharpSensor::getDistance()
     _lastIndex = _readings[_avg / 2] - MIN_RAW;
     _readingsCount = 0;
   }
-
-  return RAW_TO_CM[_lastIndex][1];
+  
+  return _lastIndex < 0 ? 0 : RAW_TO_CM[_lastIndex][1] + DISTANCE_FROM_SENSOR_TO_ROBOT_CENTER;
 }
 
 void SharpSensor::sort(int* readings)

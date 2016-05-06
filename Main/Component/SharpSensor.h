@@ -3,6 +3,9 @@
 
 #include "Arduino.h"
 
+// 4cm from sensor led to center of the robot
+#define DISTANCE_FROM_SENSOR_TO_ROBOT_CENTER 4
+
 class SharpSensor
 {
   public:

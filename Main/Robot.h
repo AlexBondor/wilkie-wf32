@@ -24,6 +24,7 @@ class Robot
 		void turnRight(int degrees);
 		void startVacuum();
 		void stopVacuum();
+		void toggleVacuum();
 		void brake();
 
 		// Wifi controller
@@ -35,6 +36,7 @@ class Robot
   		// Sensor controller
   		void startSensorsServo();
   		void stopSensorsServo();
+  		void toggleSensorsServo();
   		float getLeftEyeRawData();
   		Point getLeftEyeData();
   		float getFrontEyeRawData();
@@ -42,7 +44,14 @@ class Robot
   		float getRightEyeRawData();
   		Point getRightEyeData();
 
+  		int getNumberOfCommands();
+  		int getVacuumStatus();
+  		int getSensorsServoStatus();
+
 	private:
+		bool _vacuumFlag;
+		bool _sensorsServoFlag;
+
 		void resetFlags();
 		MotorController _motorController;
 		SensorController _sensorController;

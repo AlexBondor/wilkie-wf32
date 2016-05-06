@@ -143,6 +143,19 @@ void Robot::brake()
   _motorController.brake();
 }
 
+void Robot::toggleVacuum()
+{
+  _enablePumpFlag = !_enablePumpFlag;
+  if (_enablePumpFlag)
+  {
+    startVacuum();
+  }
+  else
+  {
+    stopVacuum();
+  }
+}
+
 void Robot::startVacuum()
 {
   _motorController.startVacuum();
@@ -214,6 +227,21 @@ bool Robot::writeToServer(char* messageToWrite, int messageToWriteSize)
 /*
  *  Sensors controller methods
  */
+
+void Robot::toggleSensorsServo()
+{
+  _enableServoFreeMoveFlag = !_enableServoFreeMoveFlag;
+  Serial.println(_enableServoFreeMoveFlag);
+  if (_enableServoFreeMoveFlag)
+  {
+    startSensorsServo();
+  }
+  else
+  {
+    stopSensorsServo();
+  }
+}
+
 void Robot::startSensorsServo()
 {
   _sensorController.setServoFreeMove(true);
@@ -252,4 +280,23 @@ float Robot::getRightEyeRawData()
 Point Robot::getRightEyeData()
 {
   return _sensorController.getSharpSensor3Data();
+}
+
+int Robot::getNumberOfCommands()
+{
+  return _motorController.getNumberOfCommands();
+}
+
+int Robot::getVacuumStatus()
+{
+  int result = 0;
+  result = _enablePumpFlag == true ? 1 : 0;
+  return result;
+}
+
+int Robot::getSensorsServoStatus()
+{
+  int result = 0;
+  result = _enableServoFreeMoveFlag == true ? 1 : 0;
+  return result;
 }

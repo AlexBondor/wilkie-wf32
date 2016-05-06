@@ -25,6 +25,8 @@ static int BLOCKS_COUNT = 20; // Size of the map in blocks
 static int BLOCK_LENGTH = 5;
 static int THRESHOLD = 10;
 int STEP; // Used to scale map to frame size
+int ROBOT_SIZE;
+
 Block[][] blockMap = new Block[BLOCKS_COUNT][BLOCKS_COUNT];
 int sensor = 1;
 
@@ -45,9 +47,7 @@ void setup()
    myClient = myServer.available();
   }   
   println("We have a new client: " + myClient.ip());
-  
-  
-  
+    
   println("Initializing map");
   // Initialize map
   STEP = width / BLOCKS_COUNT;
@@ -68,6 +68,8 @@ void setup()
    currentPosition.y -= STEP;
   }
   
+  
+  ROBOT_SIZE = 25 * STEP / BLOCK_LENGTH;  
   
   
   println("Initialize frame");
@@ -140,20 +142,24 @@ void draw()
                 {
                   Point transformedPoint = transformPoint(positionX, positionY, sensorX, sensorY, heading);
                   Point blockPoint = blockAt(transformedPoint.x, transformedPoint.y);
-                  switch(sensor)
+                  
+                  if (blockPoint.x != -1 && blockPoint.y != -1)
                   {
-                    case 1:
-                    blockMap[blockPoint.x][blockPoint.y].leftEyePoints ++;
-                    break;
-                  case 2:
-                    blockMap[blockPoint.x][blockPoint.y].frontEyePoints ++;
-                    break;
-                  case 3:
-                    blockMap[blockPoint.x][blockPoint.y].rightEyePoints ++;
-                    break;
-                  default:
-                    sensor = 1;
-                    break;
+                    switch(sensor)
+                    {
+                      case 1:
+                      blockMap[blockPoint.x][blockPoint.y].leftEyePoints ++;
+                      break;
+                    case 2:
+                      blockMap[blockPoint.x][blockPoint.y].frontEyePoints ++;
+                      break;
+                    case 3:
+                      blockMap[blockPoint.x][blockPoint.y].rightEyePoints ++;
+                      break;
+                    default:
+                      sensor = 1;
+                      break;
+                    }
                   }
                 }
               } // end of else contains "h"
@@ -206,7 +212,11 @@ void draw()
    }
   }
   Point scaledPoint = scaleCoord(positionX, positionY);
-  drawArrow(scaledPoint.x + width / 2, height / 2 - scaledPoint.y, 20, -heading);
+  if (scaledPoint.x != -1 && scaledPoint.y != -1)
+  {
+    drawRobot(scaledPoint.x + width / 2, height / 2 - scaledPoint.y, -heading);
+    drawArrow(scaledPoint.x + width / 2, height / 2 - scaledPoint.y, 20, -heading);
+  }
 }
 
 // Util classes
@@ -253,6 +263,13 @@ Point blockAt(int pointX, int pointY)
   Point result = new Point();
   Point temp = scaleCoord(pointX, pointY);
   
+  if (temp.x == -1 || temp.y == -1)
+  {
+    result.x = -1;
+    result.y = -1;
+    return result;
+  }
+  
   //println("<block:1>" + pointX + " " + pointY);
 
   result.x = temp.x - ((temp.x % STEP) + STEP) % STEP;
@@ -282,8 +299,15 @@ Point scaleCoord(int pointX, int pointY)
   int max_map = BLOCKS_COUNT * STEP / 2 - 1;
   
   // Make sure the point doesn't get out of our range.
-  result.x = pointX < min_reality ? min_reality : pointX > max_reality ? max_reality : pointX;
-  result.y = pointY < min_reality ? min_reality : pointY > max_reality ? max_reality : pointY; 
+  result.x = pointX < min_reality ? -1 : pointX > max_reality ? -1 : pointX;
+  result.y = pointY < min_reality ? -1 : pointY > max_reality ? -1 : pointY; 
+  
+  if (result.x == -1 || result.y == -1)
+  {
+    result.x = -1;
+    result.y = -1;
+    return result;
+  }
   
   //println("<block:0>" + pointX + " " + pointY);
   
@@ -291,6 +315,16 @@ Point scaleCoord(int pointX, int pointY)
   result.y = (int)map(result.y, min_reality, max_reality, min_map, max_map);
   
   return result;
+}
+
+void drawRobot(int cx, int cy, float angle)
+{
+  pushMatrix();
+  translate(cx, cy);
+  rotate(radians(angle));
+  rect(-ROBOT_SIZE / 2, -ROBOT_SIZE / 2, ROBOT_SIZE, ROBOT_SIZE, 5);
+  popMatrix();
+  
 }
 
 void drawArrow(int cx, int cy, int len, float angle)

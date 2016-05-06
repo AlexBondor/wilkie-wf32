@@ -396,3 +396,8 @@ void MotorController::updatePositionAndHeading(int motionType)
   _heading = _heading < 0 ? 360 + _heading : _heading;
   _heading = _heading > 360 ? _heading - 360 : _heading;
 }
+
+int MotorController::getNumberOfCommands()
+{
+  return _commandsCount;
+}

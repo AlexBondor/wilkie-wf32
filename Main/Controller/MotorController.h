@@ -45,6 +45,7 @@ class MotorController
     
     void brake();
 
+    int getNumberOfCommands();
   private:
     List _commands;    
     int _commandsCount;

@@ -55,135 +55,328 @@
 #include "iic/iic_slave_polling.h"
 #include "map/map_controller.h"
 
+
 #define GPIO_DEVICE_ID XPAR_GPIO_0_DEVICE_ID
 #define SPI_DEVICE_ID XPAR_XSPIPS_0_DEVICE_ID
 
-#define MAX_ARRAY_SIZE 10000
+void printMove(int next)
+{
+	switch(next)
+	{
+	case 0:
+		xil_printf("MOVE_FORWARD\r\n");
+		break;
+	case 1:
+		xil_printf("TURN_LEFT\r\n");
+		break;
+	case 2:
+		xil_printf("TURN_RIGHT\r\n");
+		break;
+	case 3:
+		xil_printf("TURN_180\r\n");
+		break;
+	case 4:
+		xil_printf("BRAKE\r\n");
+		break;
+	}
+}
 
-point SensorsRawData[MAX_ARRAY_SIZE * 3];
-point RobotPosition[MAX_ARRAY_SIZE];
-int RobotHeading[MAX_ARRAY_SIZE];
+int targetIds[BLOCKS_COUNT];
+int demoTargets[2];
+int currentBlockId, targetBlockId;
+int targetStep = 1;
+int heading = 90;
+int trueHeading;
+int offsetAngle;
 
-int IicReadingsCount = 0;
+long counter = 0;
+
+void correctHeading()
+{
+	xil_printf("correctHeading %d %d\r\n", heading, trueHeading);
+	if (trueHeading != heading)
+	{
+		if (heading == 0)
+		{
+			if (trueHeading < 45)
+			{
+				offsetAngle = trueHeading;
+			}
+			else
+			{
+				offsetAngle = trueHeading - 360;
+			}
+		}
+		else
+		{
+			if (heading == 360)
+			{
+				if (trueHeading < 45)
+				{
+					offsetAngle = trueHeading;
+				}
+				else
+				{
+					offsetAngle = trueHeading - 360;
+				}
+			}
+			else
+			{
+				offsetAngle = trueHeading - heading;
+			}
+		}
+	}
+
+	if (offsetAngle < 0)
+	{
+		if (offsetAngle <= -5)
+		{
+			sendCommand(TURN_LEFT, -offsetAngle);
+		}
+		xil_printf("Turn left %d degrees\r\n", -offsetAngle);
+		usleep(1000000);
+	}
+	else
+	{
+		if (offsetAngle >= 5)
+		{
+			sendCommand(TURN_RIGHT, offsetAngle);
+		}
+		xil_printf("Turn right %d degrees\r\n", offsetAngle);
+		usleep(1000000);
+	}
+}
 
 int main()
 {
-	xil_printf("Hello\r\n");
+	xil_printf("hello\r\n");
 
-//	MapControllerInitializeMap();
-//	int i;
-//	for (i = 0; i < 20; i++)
-//	{
-//		MapControllerPrintMap();
-//		sleep(2);
-//	}
+	XGpio_Config * xGpioConfig;
+	XGpio xGpio;
 
-//	if (IicInit() != XST_SUCCESS)
+	xGpioConfig = XGpio_LookupConfig(GPIO_DEVICE_ID);
+
+	int status = XGpio_CfgInitialize(&xGpio, xGpioConfig, xGpioConfig->BaseAddress);
+	if (status != XST_SUCCESS)
+	{
+		xil_printf("Failed to initialize GPIO\r\n");
+	}
+
+	XGpio_SetDataDirection(&xGpio, 1, 0);
+	XGpio_DiscreteWrite(&xGpio, 1, LED_0);
+
+	int j, toggle = 1;
+//	for (j = 0; j < 15; j++)
 //	{
-//		xil_printf("Failed to initialize iic component\r\n");
-//		return -1;
-//	}
-//
-//	robot_state CurrentRobotState;
-//
-//	while(1)
-//	{
-//		CurrentRobotState = IicGetRobotState();
-//
-//		RobotPosition[IicReadingsCount] = CurrentRobotState.position;
-//		RobotHeading[IicReadingsCount] = CurrentRobotState.headingAngle;
-//		SensorsRawData[IicReadingsCount * 3] = CurrentRobotState.leftSensor;
-//		SensorsRawData[IicReadingsCount * 3 + 1] = CurrentRobotState.frontSensor;
-//		SensorsRawData[IicReadingsCount * 3 + 2] = CurrentRobotState.rightSensor;
-//
-//		IicPrintRobotState(CurrentRobotState);
-//
-//		IicReadingsCount++;
-//
-//		if (IicReadingsCount == 20)
+//		if (toggle == 1)
 //		{
-//			sendCommand(TOGGLE_PUMP, 0);
-//			break;
+//			toggle = 0;
+//			XGpio_DiscreteWrite(&xGpio, 1, LED_0);
 //		}
-//		usleep(100000);
+//		else
+//		{
+//			toggle = 1;
+//			XGpio_DiscreteWrite(&xGpio, 1, 0);
+//		}
+//		usleep(1000000);
 //	}
 
-//	xil_printf("Hello World\n\r");
-//	int status;
-//	int i;
-//
-//	XGpio xGpio;
-//	XGpio_Config *xGpioConfig;
-//
-//    init_platform();
-//
-//    xGpioConfig = XGpio_LookupConfig(GPIO_DEVICE_ID);
-//	if (NULL == xGpioConfig) {
-//		return XST_FAILURE;
-//	}
-//
-//    status = XGpio_CfgInitialize(&xGpio, xGpioConfig, xGpioConfig->BaseAddress);
-//	if (status != XST_SUCCESS) {
-//		return XST_FAILURE;
-//	}
-//    xil_printf("Gpio init successful\n\r");
-//
-//
-//    xil_printf("Initialize OLED pins\n\r");
-//
-//	XSpiPs xSpi;
-//	XSpiPs_Config *xSpiConfig;
-//
-//	xSpiConfig = XSpiPs_LookupConfig(SPI_DEVICE_ID);
-//	if (NULL == xSpiConfig) {
-//		return XST_FAILURE;
-//	}
-//
-//	status = XSpiPs_CfgInitialize((&xSpi), xSpiConfig,
-//			xSpiConfig->BaseAddress);
-//	if (status != XST_SUCCESS) {
-//		return XST_FAILURE;
-//	}
-//
-//	status = XSpiPs_SetOptions((&xSpi), (XSPIPS_CR_CPHA_MASK) | \
-//			(XSPIPS_CR_CPOL_MASK));
-//	if (status != XST_SUCCESS) {
-//		return XST_FAILURE;
-//	}
-//	XSpiPs_Enable((&xSpi));
-//
-//    xil_printf("Spi init successful\n\r");
-//
-//
-//
-//    XGpio_SetDataDirection(&xGpio, 1, SW_3 | SW_2 | SW_1 | SW_0);
-//    while(1)
-//    {
-//    	XGpio_DiscreteWrite(&xGpio, 1, XGpio_DiscreteRead(&xGpio, 1) << 4 | OLED_VDD);
-//    }
-////    XGpio_DiscreteWrite(&xGpio, 1, OLED_VDD);
-////
-////    u8 init_vector[23] = {0xae, 0xd5, 0x80, 0xa8, 0x1f, 0xd3, 0x00, 0x40, 0x8d, 0x14, 0xa1, 0xc8, 0xda, 0x02, 0x81, 0x8f, 0xd9, 0xf1, 0xdb, 0x40, 0xa4, 0xa6, 0xaf};
-////    for (i = 0; i < 23; i++)
-////    {
-////    	u8 byte = init_vector[i];
-////		XGpio_DiscreteWrite(&xGpio, 1, OLED_VDD); // set DC to command
-////		XSpiPs_SetSlaveSelect(&xSpi, 0x0); //select the slave
-////		XSpiPs_PolledTransfer(&xSpi, byte, NULL, 1); //write the word
-////		XGpio_DiscreteWrite(&xGpio, 1, OLED_VDD | OLED_DC); // set DC to data
-////    }
-//
-//    getchar();
-//
-//    cleanup_platform();
-//    return 0;
+	if (IicInit() != XST_SUCCESS)
+	{
+		xil_printf("Failed to initialize iic component\r\n");
+		return -1;
+	}
+	XGpio_DiscreteWrite(&xGpio, 1, LED_1);
+
+	MapControllerInitializeMap();
+
+	int i, blockX, blockY, asc = 1;
+	for (i = 0; i < BLOCKS_COUNT; i += 2)
+	{
+		blockX = i + 4;
+		if (asc == 1)
+		{
+			blockY = 4;
+		}
+		else
+		{
+			blockY = BLOCKS_COUNT - 5;
+		}
+		targetIds[i] = blockMap[blockX][blockY].id;
+		if (asc == 1)
+		{
+			blockY = BLOCKS_COUNT - 5;
+			asc = 0;
+		}
+		else
+		{
+			blockY = 4;
+			asc = 1;
+		}
+		targetIds[i + 1] = blockMap[blockX][blockY].id;
+	}
+
+	for (i = 0; i < BLOCKS_COUNT; i++)
+	{
+		xil_printf("<%d, %d> ", i, targetIds[i]);
+	}
+
+	robot_state CurrentRobotState;
+
+	xil_printf("ready\r\n");
+
+	demoTargets[0] = blockMap[20][20].id;
+	demoTargets[1] = blockMap[6][20].id;
+
+	targetStep = 0;
+
+	while(targetStep != 2)
+	{
+		if (targetStep == 0)
+		{
+			currentBlockId = demoTargets[0];
+			targetBlockId = demoTargets[1];
+		}
+		else
+		{
+			currentBlockId = demoTargets[1];
+			targetBlockId = demoTargets[0];
+		}
+		point targetBlockCoordinates = MapControllerIdToPoint(targetBlockId);
+		point targetBlockPosition = blockMap[targetBlockCoordinates.x][targetBlockCoordinates.y].position;
+
+		while (1)
+		{
+			CurrentRobotState = IicGetRobotState();
+
+			trueHeading = CurrentRobotState.headingAngle;
+
+			MapControllerConsumeCurrentRobotState(CurrentRobotState);
+
+			if (CurrentRobotState.numberOfCommands == 0 && currentBlockId == targetBlockId)
+			{
+				xil_printf("next one\r\n");
+				targetStep ++;
+				break;
+			}
+
+			counter ++;
+			if (counter >= 30)
+			{
+				correctHeading();
+
+				point positionBlock = MapControllerBlockAt(CurrentRobotState.position.x, CurrentRobotState.position.y);
+				currentBlockId = blockMap[positionBlock.x][positionBlock.y].id;
+				int nextMove = MapControllerGetNextMove(CurrentRobotState.position, targetBlockPosition, CurrentRobotState.headingAngle);
+
+				if (CurrentRobotState.numberOfCommands == 0)
+				{
+					switch(nextMove)
+					{
+						case 0:
+							sendCommand(MOVE_FORWARD, 5);
+							break;
+						case 1:
+							sendCommand(TURN_LEFT, 90);
+							heading += 90;
+							break;
+						case 2:
+							sendCommand(TURN_RIGHT, 90);
+							heading -= 90;
+							break;
+						case 3:
+							sendCommand(TURN_LEFT, 180);
+							heading += 180;
+							break;
+						case 4:
+							sendCommand(STOP_ROBOT, 0);
+							break;
+					}
+					heading = heading < 0 ? 360 + heading : heading;
+					heading = heading > 360 ? heading - 360 : heading;
+					printMove(nextMove);
+				}
+				counter = 0;
+			}
+			usleep(100000);
+		}
+	}
+
+	targetStep = 0;
+
+	while(targetStep <= BLOCKS_COUNT)
+	{
+		currentBlockId = targetIds[targetStep - 1];
+		targetBlockId = targetIds[targetStep];
+		point targetBlockCoordinates = MapControllerIdToPoint(targetBlockId);
+		point targetBlockPosition = blockMap[targetBlockCoordinates.x][targetBlockCoordinates.y].position;
+
+		while (1)
+		{
+			CurrentRobotState = IicGetRobotState();
+
+			trueHeading = CurrentRobotState.headingAngle;
+
+			MapControllerConsumeCurrentRobotState(CurrentRobotState);
+
+			if (CurrentRobotState.numberOfCommands == 0 && currentBlockId == targetBlockId)
+			{
+				xil_printf("next one\r\n");
+				targetStep ++;
+				break;
+			}
+
+			counter ++;
+			if (counter >= 30)
+			{
+				correctHeading();
+
+				point positionBlock = MapControllerBlockAt(CurrentRobotState.position.x, CurrentRobotState.position.y);
+				currentBlockId = blockMap[positionBlock.x][positionBlock.y].id;
+				int nextMove = MapControllerGetNextMove(CurrentRobotState.position, targetBlockPosition, CurrentRobotState.headingAngle);
+
+				if (CurrentRobotState.numberOfCommands == 0)
+				{
+					switch(nextMove)
+					{
+						case 0:
+							sendCommand(MOVE_FORWARD, 5);
+							break;
+						case 1:
+							sendCommand(TURN_LEFT, 90);
+							heading += 90;
+							break;
+						case 2:
+							sendCommand(TURN_RIGHT, 90);
+							heading -= 90;
+							break;
+						case 3:
+							sendCommand(TURN_LEFT, 180);
+							heading += 180;
+							break;
+						case 4:
+							sendCommand(STOP_ROBOT, 0);
+							break;
+					}
+					heading = heading < 0 ? 360 + heading : heading;
+					heading = heading > 360 ? heading - 360 : heading;
+					printMove(nextMove);
+				}
+				counter = 0;
+			}
+			usleep(100000);
+		}
+	}
+	return 0;
 }
+
+int c = 0;
 
 void sendCommand(int command, int amount)
 {
 	u8 cmd[6];
-	sprintf(cmd, "n");
-	IicSendCommand(cmd, strlen(cmd));
+//	sprintf(cmd, "n");
+//	IicSendCommand(cmd, strlen(cmd));
 
 	switch(command)
 	{
@@ -211,6 +404,7 @@ void sendCommand(int command, int amount)
 	default:
 		break;
 	}
+	xil_printf("%s %d\r\n", cmd, c++);
 	IicSendCommand(cmd, strlen(cmd));
 
 	sprintf(cmd, "n");

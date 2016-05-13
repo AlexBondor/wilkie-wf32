@@ -308,6 +308,11 @@ void MotorController::fuzzyMove(double left, double right)
   rightMotor.turn(_rightMotorPWM * right);
 }
 
+Point MotorController::getRawPosition()
+{
+  return _position;
+}
+
 Point MotorController::getPosition()
 {
   Point centerPosition;

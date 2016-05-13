@@ -50,43 +50,43 @@ void setup()
 
   initPaddingString();
 
-  robot.connectToWifi("dd-wrt", "qaz123wsx");
-  robot.connectToServer("192.168.1.128", 44300);
-//  int size;
-//  char** networks = robot.wifiScan(size);
-//  for (int i = 0; i < size; i++)
-//  {
-//    Serial.println(networks[i]);
-//  }
+  // robot.connectToWifi("Internet", "labviewcluj");
+  // robot.connectToServer("10.113.7.37", 44300);
+  // int size;
+  // char** networks = robot.wifiScan(size);
+  // for (int i = 0; i < size; i++)
+  // {
+  //  Serial.println(networks[i]);
+  // }
   start = millis();
 }
 
 void loop()
 {
   robot.process();
-  if (millis() - start > 50)
-  {
-    start = millis();
-    sprintf(xs1, "l%d", (int)robot.getLeftEyeData().getX());
-    sprintf(ys1, "l%d", (int)robot.getLeftEyeData().getY());
-    sprintf(xs2, "f%d", (int)robot.getFrontEyeData().getX());
-    sprintf(ys2, "f%d", (int)robot.getFrontEyeData().getY());
-    sprintf(xs3, "r%d", (int)robot.getRightEyeData().getX());
-    sprintf(ys3, "r%d", (int)robot.getRightEyeData().getY());
-    sprintf(posX, "p%d", (int)robot.getPosition().getX());
-    sprintf(posY, "p%d", (int)robot.getPosition().getY());
-    sprintf(headDeg, "h%d", (int)robot.getHeading());
-    robot.writeToServer(xs1, strlen(xs1));
-    robot.writeToServer(ys1, strlen(ys1));
-    robot.writeToServer(xs2, strlen(xs2));
-    robot.writeToServer(ys2, strlen(ys2));
-    robot.writeToServer(xs3, strlen(xs3));
-    robot.writeToServer(ys3, strlen(ys3));
-    robot.writeToServer(posX, strlen(posX));
-    robot.writeToServer(posY, strlen(posY));
-    robot.writeToServer(headDeg, strlen(headDeg));
-    robot.writeToServer(headDeg, strlen(headDeg));
-  }
+ // if (millis() - start > 50)
+ // {
+ //   start = millis();
+ //   sprintf(xs1, "l%d", (int)robot.getLeftEyeData().getX());
+ //   sprintf(ys1, "l%d", (int)robot.getLeftEyeData().getY());
+ //   sprintf(xs2, "f%d", (int)robot.getFrontEyeData().getX());
+ //   sprintf(ys2, "f%d", (int)robot.getFrontEyeData().getY());
+ //   sprintf(xs3, "r%d", (int)robot.getRightEyeData().getX());
+ //   sprintf(ys3, "r%d", (int)robot.getRightEyeData().getY());
+ //   sprintf(posX, "p%d", (int)robot.getPosition().getX());
+ //   sprintf(posY, "p%d", (int)robot.getPosition().getY());
+ //   sprintf(headDeg, "h%d", (int)robot.getHeading());
+ //   robot.writeToServer(xs1, strlen(xs1));
+ //   robot.writeToServer(ys1, strlen(ys1));
+ //   robot.writeToServer(xs2, strlen(xs2));
+ //   robot.writeToServer(ys2, strlen(ys2));
+ //   robot.writeToServer(xs3, strlen(xs3));
+ //   robot.writeToServer(ys3, strlen(ys3));
+ //   robot.writeToServer(posX, strlen(posX));
+ //   robot.writeToServer(posY, strlen(posY));
+ //   robot.writeToServer(headDeg, strlen(headDeg));
+ //   robot.writeToServer(headDeg, strlen(headDeg));
+ // }
 }
 
 void iicSendData()
@@ -94,8 +94,8 @@ void iicSendData()
   sprintf(noCmds, "%d", robot.getNumberOfCommands());
   sprintf(vacF, "%d", robot.getVacuumStatus());
   sprintf(svoF, "%d", robot.getSensorsServoStatus());
-  sprintf(posX, "%d", (int)robot.getPosition().getX());
-  sprintf(posY, "%d", (int)robot.getPosition().getY());
+  sprintf(posX, "%d", (int)robot.getRawPosition().getX());
+  sprintf(posY, "%d", (int)robot.getRawPosition().getY());
   sprintf(headDeg, "%d", (int)robot.getHeading());
   sprintf(xs1, "%d", (int)robot.getLeftEyeData().getX());
   sprintf(ys1, "%d", (int)robot.getLeftEyeData().getY());
@@ -143,7 +143,6 @@ int amountIndex = 0;
  */
 void executeCommandFirst()
 {
-  Serial.println(cmd);
   switch(cmd)
   {
     case 10:
@@ -152,6 +151,8 @@ void executeCommandFirst()
       robot.brake();
       break;
     case 31:
+      Serial.print("Moving forward ");
+      Serial.println(atoi(amount)); // atoi({5, 0, -, -, - })
       robot.moveForward(atoi(amount));
       break;
     case 32:
@@ -204,17 +205,20 @@ void executeCommandFirst()
  *  n    - no operation; robot proceeds normally
  *  pv   - power vacuum
  */
+int ccc = 0;
 void iicRecvData(int numBytes)
 {
   char x;
   while(Wire.available() != 0)
   {
     x = Wire.read();
+    Serial.print(x);
     switch(x)
     {
       case 'n':
         if (cmd != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd = 10;
@@ -223,6 +227,7 @@ void iicRecvData(int numBytes)
       case 's':
         if (cmd != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd = 20;
@@ -231,6 +236,7 @@ void iicRecvData(int numBytes)
       case 'm':
         if (cmd != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd = 30;
@@ -239,6 +245,7 @@ void iicRecvData(int numBytes)
       case 't':
         if (cmd != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd = 40;
@@ -247,6 +254,7 @@ void iicRecvData(int numBytes)
       case 'p':
         if (cmd != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd = 50;
@@ -255,6 +263,7 @@ void iicRecvData(int numBytes)
       case 'f':
         if (cmd % 10 != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd += 1;
@@ -262,6 +271,7 @@ void iicRecvData(int numBytes)
       case 'b':
         if (cmd % 10 != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd += 2;
@@ -269,6 +279,7 @@ void iicRecvData(int numBytes)
       case 'l':
         if (cmd % 10 != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd += 3;
@@ -276,6 +287,7 @@ void iicRecvData(int numBytes)
       case 'r':
         if (cmd % 10 != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd += 4;
@@ -283,6 +295,7 @@ void iicRecvData(int numBytes)
       case 'v':
         if (cmd % 10 != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd += 5;
@@ -290,11 +303,13 @@ void iicRecvData(int numBytes)
       case 'o':
         if (cmd % 10 != 0)
         {
+          amount[amountIndex] = ' ';
           executeCommandFirst();
         }
         cmd += 6;
         break;
       default:
+        Serial.println("default");
         if (x - '0' >= 0 && x - '0' <= 9)
         {
           amount[amountIndex++] = x;
@@ -306,6 +321,8 @@ void iicRecvData(int numBytes)
         break;
     }
   }
+  ccc += 1;
+  Serial.println(ccc);
 }
 
 void initPaddingString()

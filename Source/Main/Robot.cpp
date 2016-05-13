@@ -113,6 +113,11 @@ Point Robot::getPosition()
   return _motorController.getPosition();
 }
 
+Point Robot::getRawPosition()
+{
+  return _motorController.getRawPosition();
+}
+
 double Robot::getHeading()
 {
   return _motorController.getHeading();

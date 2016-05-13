@@ -5,7 +5,7 @@
 #include <DEWFcK.h>
 #include "../Util/ByteList.h"
 
-#define WIFI_DEBUG
+//#define WIFI_DEBUG
 
 TCPSocket _tcpSocket;
 STATE state = NONE;

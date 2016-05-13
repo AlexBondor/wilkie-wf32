@@ -33,6 +33,7 @@ class MotorController
     MotorController();
     void init();
     Point getPosition();
+    Point getRawPosition();
     double getHeading();
     void process();
     void moveForward(double distance);

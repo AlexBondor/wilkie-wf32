@@ -1,0 +1,2 @@
+This is the source code for the visualizing tool. The project requires Processing IDE.
+In order for the visualization to work real time over WiFi, the right setup must be made on the WF32 board. (see 'void setup()')
